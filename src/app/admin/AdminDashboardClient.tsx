@@ -30,26 +30,74 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
   const [settingsState, setSettingsState] = useState(settings);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [editingPackage, setEditingPackage] = useState<any>(null);
-  const [addingGalleryImage, setAddingGalleryImage] = useState<{ image_url: string, title: string, category: string } | null>(null);
   const [editingPost, setEditingPost] = useState<any>(null);
+  const [editingPackage, setEditingPackage] = useState<any>(null);
+  const [addingGalleryImage, setAddingGalleryImage] = useState<any>(null);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  const notify = (message: string, type: 'success' | 'error' = 'success') => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
+  const compressImage = (file: File): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 2500;
+          const MAX_HEIGHT = 2500;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            resolve(blob || file);
+          }, 'image/jpeg', 0.85);
+        };
+      };
+    });
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    
     try {
+      const blob = await compressImage(file);
+      const formData = new FormData();
+      formData.append("file", blob, file.name);
+      
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
       if (data.url) {
         setSettingsState(prev => ({ ...prev, [field]: data.url }));
+        notify(isRtl ? "تم رفع الصورة بنجاح" : "Image uploaded successfully");
+      } else {
+        notify(isRtl ? "فشل الرفع: " + (data.error || "خطأ غير معروف") : "Upload failed: " + (data.error || "Unknown error"), "error");
       }
     } catch (error) {
       console.error(error);
+      notify(isRtl ? "حدث خطأ أثناء الرفع" : "Error occurred during upload", "error");
     } finally {
       setIsUploading(false);
     }
@@ -929,12 +977,20 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                       const file = e.target.files?.[0];
                       if (!file) return;
                       setIsUploading(true);
-                      const formData = new FormData();
-                      formData.append("file", file);
                       try {
+                        const blob = await compressImage(file);
+                        const formData = new FormData();
+                        formData.append("file", blob, file.name);
                         const res = await fetch("/api/upload", { method: "POST", body: formData });
                         const data = await res.json();
-                        if (data.url) setAddingGalleryImage({...addingGalleryImage, image_url: data.url});
+                        if (data.url) {
+                          setAddingGalleryImage({...addingGalleryImage, image_url: data.url});
+                          notify(isRtl ? "تم رفع الصورة" : "Image uploaded");
+                        } else {
+                          notify(isRtl ? "خطأ في الرفع" : "Upload failed", "error");
+                        }
+                      } catch (err) {
+                        notify(isRtl ? "خطأ في الاتصال" : "Connection error", "error");
                       } finally {
                         setIsUploading(false);
                       }
@@ -1022,12 +1078,20 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                       const file = e.target.files?.[0];
                       if (!file) return;
                       setIsUploading(true);
-                      const formData = new FormData();
-                      formData.append("file", file);
                       try {
+                        const blob = await compressImage(file);
+                        const formData = new FormData();
+                        formData.append("file", blob, file.name);
                         const res = await fetch("/api/upload", { method: "POST", body: formData });
                         const data = await res.json();
-                        if (data.url) setEditingPost({...editingPost, image_url: data.url});
+                        if (data.url) {
+                          setEditingPost({...editingPost, image_url: data.url});
+                          notify(isRtl ? "تم رفع الصورة" : "Image uploaded");
+                        } else {
+                          notify(isRtl ? "خطأ في الرفع" : "Upload failed", "error");
+                        }
+                      } catch (err) {
+                        notify(isRtl ? "خطأ في الاتصال" : "Connection error", "error");
                       } finally {
                         setIsUploading(false);
                       }
@@ -1077,10 +1141,20 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
         </div>
       )}
 
+      {/* Notification Toast */}
+      {notification && (
+        <div style={s({ position: "fixed", bottom: 24, [isRtl ? 'left' : 'right']: 24, zIndex: 10000, background: notification.type === 'error' ? '#ff4d4d' : 'var(--pink)', color: '#fff', padding: "12px 24px", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.3)", fontWeight: 700, display: "flex", alignItems: "center", gap: 12 })}>
+          <span className="icon">{notification.type === 'error' ? 'error' : 'check_circle'}</span>
+          {notification.message}
+        </div>
+      )}
+
       <style>{`
         @media(max-width:1100px){
           .admin-grid { grid-template-columns: 1fr !important; }
         }
+        .anim-scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
       `}</style>
     </div>
   );
