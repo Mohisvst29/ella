@@ -16,12 +16,14 @@ interface AdminProps {
   subscribers: any[];
   settings: Record<string, string>;
   teamMembers: any[];
+  services: any[];
+  addons: any[];
 }
 
 const englishFonts = ["Playfair Display", "Inter", "Roboto", "Montserrat", "Cinzel", "Cormorant Garamond", "Libre Baskerville", "Bodoni Moda", "Prata"];
 const arabicFonts = ["Tajawal", "Cairo", "Almarai", "Amiri", "Reem Kufi", "El Messiri", "Changa", "Harmattan", "Lalezar"];
 
-export default function AdminDashboardClient({ bookings, stats, galleryItems = [], blogPosts = [], packages = [], subscribers = [], settings = {}, teamMembers = [] }: AdminProps) {
+export default function AdminDashboardClient({ bookings, stats, galleryItems = [], blogPosts = [], packages = [], subscribers = [], settings = {}, teamMembers = [], services = [], addons = [] }: AdminProps) {
   const { t, isRtl } = useLanguage();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("Overview");
@@ -35,6 +37,8 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
   const [editingPackage, setEditingPackage] = useState<any>(null);
   const [addingGalleryImage, setAddingGalleryImage] = useState<any>(null);
   const [editingTeamMember, setEditingTeamMember] = useState<any>(null);
+  const [editingService, setEditingService] = useState<any>(null);
+  const [editingAddon, setEditingAddon] = useState<any>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   const notify = (message: string, type: 'success' | 'error' = 'success') => {
@@ -85,9 +89,13 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     
     setIsUploading(true);
     try {
-      const blob = await compressImage(file);
+      let fileToUpload: File | Blob = file;
+      if (file.type.startsWith('image/')) {
+        fileToUpload = await compressImage(file);
+      }
+      
       const formData = new FormData();
-      formData.append("file", blob, file.name);
+      formData.append("file", fileToUpload, file.name);
       
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
@@ -147,6 +155,48 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     }
   };
 
+  const saveService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    const method = editingService.id ? "PATCH" : "POST";
+    const url = editingService.id ? `/api/services/${editingService.id}` : "/api/services";
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingService),
+      });
+      if (res.ok) {
+        setEditingService(null);
+        notify(isRtl ? "تم حفظ الخدمة بنجاح" : "Service saved successfully");
+        router.refresh();
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const saveAddon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    const method = editingAddon.id ? "PATCH" : "POST";
+    const url = editingAddon.id ? `/api/addons/${editingAddon.id}` : "/api/addons";
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingAddon),
+      });
+      if (res.ok) {
+        setEditingAddon(null);
+        notify(isRtl ? "تم حفظ الخدمة الإضافية بنجاح" : "Add-on saved successfully");
+        router.refresh();
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const navItems = [
     { id: "Overview", icon: "grid_view", label: t("admin.dashboard") },
     { id: "Gallery", icon: "photo_library", label: t("admin.gallery") },
@@ -155,6 +205,8 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     { id: "Inquiries", icon: "mail", label: t("admin.inquiries") },
     { id: "Subscribers", icon: "group", label: t("admin.subscribers") },
     { id: "Team", icon: "badge", label: isRtl ? "فريق العمل" : "Team" },
+    { id: "Services", icon: "photo_camera", label: isRtl ? "الخدمات" : "Services" },
+    { id: "Addons", icon: "add_circle", label: isRtl ? "الخدمات الإضافية" : "Add-ons" },
     { id: "Settings", icon: "settings", label: isRtl ? "الإعدادات" : "Settings" },
   ];
 
@@ -480,6 +532,131 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           </div>
         )}
 
+        {activeTab === "Team" && (
+          <div>
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? "فريق العمل" : "Our Team"}</h2>
+              <button onClick={() => setEditingTeamMember({ name: "", name_ar: "", role: "", role_ar: "", image_url: "", order: teamMembers.length + 1 })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ إضافة عضو</button>
+            </div>
+            <div style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden" })}>
+              <table style={s({ width: "100%", borderCollapse: "collapse", textAlign: isRtl ? "right" : "left" })}>
+                <thead>
+                  <tr style={s({ background: "rgba(255,255,255,0.02)" })}>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "العضو" : "Member"}</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "الدور" : "Role"}</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "إجراءات" : "Actions"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamMembers.map((member: any) => (
+                    <tr key={member.id} style={s({ borderTop: "1px solid var(--border)" })}>
+                      <td style={s({ padding: "16px 20px" })}>
+                        <div style={s({ display: "flex", alignItems: "center", gap: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                          <div style={s({ width: 40, height: 40, borderRadius: "50%", background: `url(${member.image_url}) center/cover`, border: "1px solid var(--border)" })} />
+                          <div style={s({ fontSize: 14, fontWeight: 600 })}>{isRtl ? (member.name_ar || member.name) : member.name}</div>
+                        </div>
+                      </td>
+                      <td style={s({ padding: "16px 20px", fontSize: 13, color: "var(--text-dim)" })}>{isRtl ? (member.role_ar || member.role) : member.role}</td>
+                      <td style={s({ padding: "16px 20px" })}>
+                        <div style={s({ display: "flex", gap: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                          <button onClick={() => setEditingTeamMember(member)} style={s({ background: "none", border: "none", color: "var(--pink)", cursor: "pointer", fontSize: 13 })}>{isRtl ? "تعديل" : "Edit"}</button>
+                          <button onClick={async () => {
+                            if(confirm(isRtl ? "حذف هذا العضو؟" : "Delete this member?")) {
+                              await fetch(`/api/team/${member.id}`, { method: 'DELETE' });
+                              router.refresh();
+                            }
+                          }} style={s({ background: "none", border: "none", color: "#ff4d4d", cursor: "pointer", fontSize: 13 })}>{isRtl ? "حذف" : "Delete"}</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "Services" && (
+          <div>
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? "الخدمات" : "Services"}</h2>
+              <button onClick={() => setEditingService({ title: "", title_ar: "", desc: "", desc_ar: "", image_url: "", order: services.length + 1 })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ خدمة جديدة</button>
+            </div>
+            <div style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden" })}>
+              <table style={s({ width: "100%", borderCollapse: "collapse", textAlign: isRtl ? "right" : "left" })}>
+                <thead>
+                  <tr style={s({ background: "rgba(255,255,255,0.02)" })}>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "الخدمة" : "Service"}</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "إجراءات" : "Actions"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {services.map((service: any) => (
+                    <tr key={service.id} style={s({ borderTop: "1px solid var(--border)" })}>
+                      <td style={s({ padding: "16px 20px" })}>
+                        <div style={s({ display: "flex", alignItems: "center", gap: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                          <div style={s({ width: 60, height: 40, borderRadius: 8, background: `url(${service.image_url}) center/cover`, border: "1px solid var(--border)" })} />
+                          <div style={s({ fontSize: 14, fontWeight: 600 })}>{isRtl ? (service.title_ar || service.title) : service.title}</div>
+                        </div>
+                      </td>
+                      <td style={s({ padding: "16px 20px" })}>
+                        <div style={s({ display: "flex", gap: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                          <button onClick={() => setEditingService(service)} style={s({ background: "none", border: "none", color: "var(--pink)", cursor: "pointer", fontSize: 13 })}>{isRtl ? "تعديل" : "Edit"}</button>
+                          <button onClick={async () => {
+                            if(confirm(isRtl ? "حذف هذه الخدمة؟" : "Delete this service?")) {
+                              await fetch(`/api/services/${service.id}`, { method: 'DELETE' });
+                              router.refresh();
+                            }
+                          }} style={s({ background: "none", border: "none", color: "#ff4d4d", cursor: "pointer", fontSize: 13 })}>{isRtl ? "حذف" : "Delete"}</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "Addons" && (
+          <div>
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? "الخدمات الإضافية" : "Add-ons"}</h2>
+              <button onClick={() => setEditingAddon({ name: "", name_ar: "", active: 1 })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ إضافة خيار</button>
+            </div>
+            <div style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden" })}>
+              <table style={s({ width: "100%", borderCollapse: "collapse", textAlign: isRtl ? "right" : "left" })}>
+                <thead>
+                  <tr style={s({ background: "rgba(255,255,255,0.02)" })}>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "الخدمة" : "Add-on"}</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "إجراءات" : "Actions"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {addons.map((addon: any) => (
+                    <tr key={addon.id} style={s({ borderTop: "1px solid var(--border)" })}>
+                      <td style={s({ padding: "16px 20px" })}>
+                        <div style={s({ fontSize: 14, fontWeight: 600 })}>{isRtl ? (addon.name_ar || addon.name) : addon.name}</div>
+                      </td>
+                      <td style={s({ padding: "16px 20px" })}>
+                        <div style={s({ display: "flex", gap: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                          <button onClick={() => setEditingAddon(addon)} style={s({ background: "none", border: "none", color: "var(--pink)", cursor: "pointer", fontSize: 13 })}>{isRtl ? "تعديل" : "Edit"}</button>
+                          <button onClick={async () => {
+                            if(confirm(isRtl ? "حذف هذا الخيار؟" : "Delete this option?")) {
+                              await fetch(`/api/addons/${addon.id}`, { method: 'DELETE' });
+                              router.refresh();
+                            }
+                          }} style={s({ background: "none", border: "none", color: "#ff4d4d", cursor: "pointer", fontSize: 13 })}>{isRtl ? "حذف" : "Delete"}</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {activeTab === "Settings" && (
           <div>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
@@ -620,9 +797,10 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                           const file = e.target.files?.[0];
                           if (!file) return;
                           setIsUploading(true);
-                          const formData = new FormData();
-                          formData.append("file", file);
                           try {
+                            const blob = await compressImage(file);
+                            const formData = new FormData();
+                            formData.append("file", blob, file.name);
                             const res = await fetch("/api/upload", { method: "POST", body: formData });
                             const data = await res.json();
                             if (data.url) {
@@ -631,7 +809,10 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                                 arr.push(data.url);
                                 return {...prev, hero_bg_url: arr.join(",")};
                               });
+                              notify(isRtl ? "تم رفع الصورة بنجاح" : "Image uploaded successfully");
                             }
+                          } catch (err) {
+                            notify(isRtl ? "حدث خطأ أثناء الرفع" : "Error occurred during upload", "error");
                           } finally {
                             setIsUploading(false);
                           }
@@ -1238,7 +1419,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                 </div>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الاسم (AR)" : "Name (AR)"}</label>
-                  <input required type="text" value={editingTeamMember.name_ar || ""} onChange={setEditingTeamMember && (e => setEditingTeamMember({ ...editingTeamMember, name_ar: e.target.value }))} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                  <input required type="text" value={editingTeamMember.name_ar || ""} onChange={e => setEditingTeamMember({ ...editingTeamMember, name_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
                 </div>
               </div>
 
@@ -1290,3 +1471,106 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     </div>
   );
 }
+
+{/* Service Modal */}
+{editingService && (
+  <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
+    <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 600, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+      <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
+        <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingService.id ? (isRtl ? "تعديل خدمة" : "Edit Service") : (isRtl ? "إضافة خدمة" : "Add Service")}</h3>
+        <button onClick={() => setEditingService(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
+          <span className="icon">close</span>
+        </button>
+      </div>
+
+      <form onSubmit={saveService} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+        <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+          <div>
+            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
+            <input required type="text" value={editingService.title || ""} onChange={e => setEditingService({ ...editingService, title: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+          </div>
+          <div>
+            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (AR)" : "Title (AR)"}</label>
+            <input required type="text" value={editingService.title_ar || ""} onChange={e => setEditingService({ ...editingService, title_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+          </div>
+        </div>
+
+        <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+          <div>
+            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
+            <textarea rows={3} value={editingService.desc || ""} onChange={e => setEditingService({ ...editingService, desc: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+          </div>
+          <div>
+            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (AR)" : "Description (AR)"}</label>
+            <textarea rows={3} value={editingService.desc_ar || ""} onChange={e => setEditingService({ ...editingService, desc_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+          </div>
+        </div>
+
+        <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+          <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة الخدمة" : "Service Image"}</label>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input type="text" value={editingService.image_url || ""} onChange={e => setEditingService({ ...editingService, image_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+            <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+              <span className="icon">upload</span>
+              <input type="file" accept="image/*" style={{ display: "none" }} onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setIsUploading(true);
+                const formData = new FormData();
+                formData.append("file", file);
+                try {
+                  const res = await fetch("/api/upload", { method: "POST", body: formData });
+                  const data = await res.json();
+                  if (data.url) setEditingService({ ...editingService, image_url: data.url });
+                } finally {
+                  setIsUploading(false);
+                }
+              }} />
+            </label>
+          </div>
+        </div>
+
+        <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+          <button type="button" onClick={() => setEditingService(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
+          <button type="submit" disabled={isSaving || isUploading} className="btn btn-primary">
+            {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Service")}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
+{/* Addon Modal */}
+{editingAddon && (
+  <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
+    <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 500, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+      <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
+        <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingAddon.id ? (isRtl ? "تعديل خيار" : "Edit Option") : (isRtl ? "إضافة خيار" : "Add Option")}</h3>
+        <button onClick={() => setEditingAddon(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
+          <span className="icon">close</span>
+        </button>
+      </div>
+
+      <form onSubmit={saveAddon} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+        <div style={s({ display: "flex", flexDirection: "column", gap: 16 })}>
+          <div>
+            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم الخيار (EN)" : "Option Name (EN)"}</label>
+            <input required type="text" value={editingAddon.name || ""} onChange={e => setEditingAddon({ ...editingAddon, name: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+          </div>
+          <div>
+            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم الخيار (AR)" : "Option Name (AR)"}</label>
+            <input required type="text" value={editingAddon.name_ar || ""} onChange={e => setEditingAddon({ ...editingAddon, name_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+          </div>
+        </div>
+
+        <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+          <button type="button" onClick={() => setEditingAddon(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
+          <button type="submit" disabled={isSaving} className="btn btn-primary">
+            {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Option")}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}

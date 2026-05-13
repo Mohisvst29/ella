@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
@@ -9,19 +9,22 @@ export default function ContactForm() {
   const searchParams = useSearchParams();
   const [pkg, setPkg] = useState(searchParams.get("package") || "essential");
   const [services, setServices] = useState<string[]>([]);
+  const [addons, setAddons] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/addons").then(r => r.json()).then(data => {
+      if (Array.isArray(data)) setAddons(data);
+    }).catch(() => {});
+  }, []);
 
   const pkgs = [
     { id: "essential", label: isRtl ? "أساسي" : "Essential", desc: isRtl ? "تغطية أساسية" : "Basic Coverage" },
     { id: "premium", label: isRtl ? "بريميوم" : "Premium", desc: isRtl ? "يوم كامل + ألبوم" : "Full Day + Album" },
     { id: "legacy", label: isRtl ? "ليجاسي" : "Legacy", desc: isRtl ? "تصوير فوتوغرافي + فيديو" : "Photo + Video" },
   ];
-
-  const addons = isRtl 
-    ? ["تصوير درون", "طباعة فورية", "ألبوم يدوي", "تعديل سريع (7 أيام)"]
-    : ["Drone Footage", "Instant Printing", "Handcrafted Album", "Rush Editing (7 Days)"];
 
   const toggle = (s: string) => setServices(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s]);
 
@@ -154,14 +157,17 @@ export default function ContactForm() {
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: 12, textAlign: isRtl ? "right" : "left" }}>{t("contact.form.addons")}</label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, flexDirection: isRtl ? "row-reverse" : "row" }}>
-                  {addons.map(s => (
-                    <button type="button" key={s} onClick={() => toggle(s)} style={{
-                      padding: "8px 18px", borderRadius: 50, fontSize: 13, cursor: "pointer", fontFamily: "inherit",
-                      border: services.includes(s) ? "1px solid var(--pink)" : "1px solid var(--border)",
-                      background: services.includes(s) ? "rgba(255,176,204,0.1)" : "var(--surface)",
-                      color: services.includes(s) ? "var(--pink)" : "var(--text-muted)",
-                    }}>{s}</button>
-                  ))}
+                  {addons.map(s => {
+                    const label = isRtl ? (s.name_ar || s.name) : s.name;
+                    return (
+                      <button type="button" key={s.id} onClick={() => toggle(label)} style={{
+                        padding: "8px 18px", borderRadius: 50, fontSize: 13, cursor: "pointer", fontFamily: "inherit",
+                        border: services.includes(label) ? "1px solid var(--pink)" : "1px solid var(--border)",
+                        background: services.includes(label) ? "rgba(255,176,204,0.1)" : "var(--surface)",
+                        color: services.includes(label) ? "var(--pink)" : "var(--text-muted)",
+                      }}>{label}</button>
+                    );
+                  })}
                 </div>
               </div>
 

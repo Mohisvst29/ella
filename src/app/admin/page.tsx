@@ -1,4 +1,4 @@
-import connectToDatabase, { Booking, Package, GalleryItem, BlogPost, SiteSetting, NewsletterSubscriber, TeamMember } from "@/lib/db";
+import connectToDatabase, { Booking, Package, GalleryItem, BlogPost, SiteSetting, NewsletterSubscriber, TeamMember, Service, Addon } from "@/lib/db";
 import AdminDashboardClient from "./AdminDashboardClient";
 
 export const dynamic = "force-dynamic";
@@ -42,13 +42,16 @@ export default async function AdminPage() {
   dbSettings.forEach((s: any) => { settingsMap[s.key] = s.value; });
 
   const teamMembers = await TeamMember.find().sort({ order: 1 }).lean();
+  const services = await Service.find().sort({ order: 1 }).lean();
+  const addons = await Addon.find().lean();
 
   // Map _id to id for client components
   const mapIds = (arr: any[]) => arr.map(item => {
     const id = item._id.toString();
-    delete item._id;
-    delete item.__v;
-    return { ...item, id };
+    const newItem = { ...item, id };
+    delete (newItem as any)._id;
+    delete (newItem as any).__v;
+    return newItem;
   });
 
   return (
@@ -70,6 +73,8 @@ export default async function AdminPage() {
       subscribers={mapIds(subscribers)}
       settings={settingsMap}
       teamMembers={mapIds(teamMembers)}
+      services={mapIds(services)}
+      addons={mapIds(addons)}
     />
   );
 }

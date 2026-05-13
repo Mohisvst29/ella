@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import connectToDatabase, { TeamMember } from "@/lib/db";
+import connectToDatabase, { Service } from "@/lib/db";
 
 export async function PATCH(
   request: Request,
@@ -9,10 +9,10 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
     await connectToDatabase();
-    const member = await TeamMember.findByIdAndUpdate(id, body, { new: true });
-    return NextResponse.json(member);
+    const service = await Service.findByIdAndUpdate(id, body, { new: true });
+    return NextResponse.json(service);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update team member" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update service" }, { status: 500 });
   }
 }
 
@@ -23,9 +23,9 @@ export async function DELETE(
   try {
     const { id } = await params;
     await connectToDatabase();
-    await TeamMember.findByIdAndDelete(id);
+    await Service.findByIdAndDelete(id);
     return NextResponse.json({ message: "Deleted successfully" });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to delete team member" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete service" }, { status: 500 });
   }
 }

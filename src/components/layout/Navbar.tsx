@@ -24,6 +24,7 @@ export default function Navbar() {
 
   const links = [
     { href: "/gallery", label: t("nav.gallery") },
+    { href: "/services", label: t("nav.services") },
     { href: "/about", label: t("nav.about") },
     { href: "/packages", label: t("nav.pricing") },
     { href: "/blog", label: t("nav.blog") },
