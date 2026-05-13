@@ -12,6 +12,16 @@ export default function HeroSection() {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Function to convert Google Drive link to direct link
+  const getDirectLink = (url: string) => {
+    if (!url) return "";
+    if (url.includes("drive.google.com")) {
+      const id = url.split("/d/")[1]?.split("/")[0] || url.split("id=")[1]?.split("&")[0];
+      if (id) return `https://drive.google.com/uc?export=download&id=${id}`;
+    }
+    return url;
+  };
+
   const images = (settings?.hero_bg_url || "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop")
     .split(",")
     .filter(Boolean);
@@ -23,6 +33,10 @@ export default function HeroSection() {
       desc: settings?.hero_desc_en ? (isRtl ? settings.hero_desc_ar : settings.hero_desc_en) : t("hero.desc")
     }
   ];
+
+  const heroTagline = isRtl ? (settings?.hero_tagline_ar || t("hero.tagline")) : (settings?.hero_tagline_en || t("hero.tagline"));
+  const heroCta1 = isRtl ? (settings?.hero_cta1_ar || t("hero.cta1")) : (settings?.hero_cta1_en || t("hero.cta1"));
+  const heroCta2 = isRtl ? (settings?.hero_cta2_ar || t("hero.cta2")) : (settings?.hero_cta2_en || t("hero.cta2"));
 
   if (settings?.hero_title2_en || settings?.hero_title2_ar) {
     slides.push({
@@ -69,7 +83,7 @@ export default function HeroSection() {
           <>
             <video 
               ref={videoRef}
-              src={settings.hero_video_url} 
+              src={getDirectLink(settings.hero_video_url)} 
               autoPlay loop muted={isMuted} playsInline 
               style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", opacity: 0.6 }} 
             />
@@ -111,7 +125,7 @@ export default function HeroSection() {
           {/* Tagline */}
           <div className="anim-fade-up" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 24 }}>
             <span style={{ width: 40, height: 1, background: "var(--pink)" }} />
-            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--pink)" }}>{t("hero.tagline")}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--pink)" }}>{heroTagline}</span>
             <span style={{ width: 40, height: 1, background: "var(--pink)" }} />
           </div>
 
@@ -167,8 +181,8 @@ export default function HeroSection() {
 
           {/* CTAs */}
           <div className="anim-fade-up delay-3" style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginTop: 20 }}>
-            <Link href="/contact" className="btn btn-primary" style={{ padding: "16px 36px" }}>{t("hero.cta1")}</Link>
-            <Link href="/gallery" className="btn btn-outline" style={{ padding: "16px 36px" }}>{t("hero.cta2")}</Link>
+            <Link href="/contact" className="btn btn-primary" style={{ padding: "16px 36px" }}>{heroCta1}</Link>
+            <Link href="/gallery" className="btn btn-outline" style={{ padding: "16px 36px" }}>{heroCta2}</Link>
           </div>
 
           {/* Stats */}

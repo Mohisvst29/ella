@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import connectToDatabase, { SiteSetting } from "@/lib/db";
 
+export async function POST(request: Request) {
+  return PATCH(request);
+}
+
 export async function PATCH(request: Request) {
   try {
     const data = await request.json();

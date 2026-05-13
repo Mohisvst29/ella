@@ -22,7 +22,10 @@ export const translations: any = {
         weddings: "Weddings Captured",
         crew: "Female Crew",
         years: "Years of Excellence"
-      }
+      },
+      tagline: "Unveiling Elegance",
+      cta1: "Book Your Date",
+      cta2: "View Gallery"
     },
     services: {
       eyebrow: "Our Expertise",
@@ -237,7 +240,10 @@ export const translations: any = {
         weddings: "حفل تم توثيقه",
         crew: "طاقم نسائي بالكامل",
         years: "سنوات من التميز"
-      }
+      },
+      tagline: "نكشف عن الأناقة",
+      cta1: "احجز موعدك",
+      cta2: "مشاهدة المعرض"
     },
     services: {
       eyebrow: "خبراتنا",

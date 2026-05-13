@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 
-interface Booking { id: string; client_name: string; mobile: string; email: string|null; event_type: string; venue_location: string|null; package: string; additional_services: string|null; notes: string|null; status: string; created_at: string; }
+interface Booking { id: string; client_name: string; mobile: string; email: string|null; event_type: string; event_date: string|null; venue_location: string|null; package: string; additional_services: string|null; notes: string|null; status: string; created_at: string; }
 interface Stats { totalBookings: number; revenue: number; galleryCount: number; newToday: number; pendingBookings: number; confirmedBookings: number; blogCount: number; subscriberCount: number; }
 
 interface AdminProps {
@@ -843,6 +843,43 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
               {/* Hero Content Section */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "نصوص الهيدر (Hero Content)" : "Hero Content"}</h3>
+                
+                {/* Global Hero Settings */}
+                <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,176,204,0.03)", borderRadius: 12, border: "1px solid var(--border)" })}>
+                  <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--pink)" })}>{isRtl ? "إعدادات عامة (العنوان العلوي والأزرار)" : "Global Settings (Tagline & Buttons)"}</h4>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الصغير العلوي (EN)" : "Upper Tagline (EN)"}</label>
+                        <input type="text" value={settingsState.hero_tagline_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_tagline_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الصغير العلوي (AR)" : "Upper Tagline (AR)"}</label>
+                        <input type="text" value={settingsState.hero_tagline_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_tagline_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
+                    </div>
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "نص زر احجز الآن (EN)" : "CTA Button 1 (EN)"}</label>
+                        <input type="text" value={settingsState.hero_cta1_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_cta1_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "نص زر احجز الآن (AR)" : "CTA Button 1 (AR)"}</label>
+                        <input type="text" value={settingsState.hero_cta1_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_cta1_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
+                    </div>
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "نص زر المعرض (EN)" : "CTA Button 2 (EN)"}</label>
+                        <input type="text" value={settingsState.hero_cta2_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_cta2_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "نص زر المعرض (AR)" : "CTA Button 2 (AR)"}</label>
+                        <input type="text" value={settingsState.hero_cta2_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_cta2_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 
                 {/* Slide 1 */}
                 <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,255,255,0.01)", borderRadius: 12, border: "1px solid var(--border)" })}>
