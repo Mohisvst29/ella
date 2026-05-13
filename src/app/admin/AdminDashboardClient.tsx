@@ -842,35 +842,94 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
               {/* Hero Content Section */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "نصوص الهيدر (Hero Content)" : "Hero Content"}</h3>
-                <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-                  <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
-                    <div>
-                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الأساسي (EN)" : "Primary Title (EN)"}</label>
-                      <input type="text" value={settingsState.hero_title_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_title_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                
+                {/* Slide 1 */}
+                <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,255,255,0.01)", borderRadius: 12, border: "1px solid var(--border)" })}>
+                  <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--pink)" })}>{isRtl ? "الشريحة 1 (الأساسية)" : "Slide 1 (Main)"}</h4>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الأساسي (EN)" : "Primary Title (EN)"}</label>
+                        <input type="text" value={settingsState.hero_title_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_title_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الأساسي (AR)" : "Primary Title (AR)"}</label>
+                        <input type="text" value={settingsState.hero_title_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_title_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
                     </div>
-                    <div>
-                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الأساسي (AR)" : "Primary Title (AR)"}</label>
-                      <input type="text" value={settingsState.hero_title_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_title_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الكلمة الملونة (EN)" : "Gradient Text (EN)"}</label>
+                        <input type="text" value={settingsState.hero_span_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_span_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الكلمة الملونة (AR)" : "Gradient Text (AR)"}</label>
+                        <input type="text" value={settingsState.hero_span_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_span_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
+                    </div>
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
+                        <textarea rows={2} value={settingsState.hero_desc_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (AR)" : "Description (AR)"}</label>
+                        <textarea rows={2} value={settingsState.hero_desc_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
                     </div>
                   </div>
-                  <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
-                    <div>
-                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الكلمة الملونة (EN)" : "Gradient Text (EN)"}</label>
-                      <input type="text" value={settingsState.hero_span_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_span_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+
+                {/* Slide 2 */}
+                <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,255,255,0.01)", borderRadius: 12, border: "1px solid var(--border)" })}>
+                  <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--cyan)" })}>{isRtl ? "الشريحة 2" : "Slide 2"}</h4>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
+                        <input type="text" value={settingsState.hero_title2_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_title2_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (AR)" : "Title (AR)"}</label>
+                        <input type="text" value={settingsState.hero_title2_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_title2_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
                     </div>
-                    <div>
-                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الكلمة الملونة (AR)" : "Gradient Text (AR)"}</label>
-                      <input type="text" value={settingsState.hero_span_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_span_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
+                        <textarea rows={2} value={settingsState.hero_desc2_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc2_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (AR)" : "Description (AR)"}</label>
+                        <textarea rows={2} value={settingsState.hero_desc2_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc2_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
                     </div>
                   </div>
-                  <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
-                    <div>
-                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
-                      <textarea rows={3} value={settingsState.hero_desc_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+
+                {/* Slide 3 */}
+                <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,255,255,0.01)", borderRadius: 12, border: "1px solid var(--border)" })}>
+                  <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--purple)" })}>{isRtl ? "الشريحة 3" : "Slide 3"}</h4>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
+                        <input type="text" value={settingsState.hero_title3_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_title3_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (AR)" : "Title (AR)"}</label>
+                        <input type="text" value={settingsState.hero_title3_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_title3_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
                     </div>
-                    <div>
-                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (AR)" : "Description (AR)"}</label>
-                      <textarea rows={3} value={settingsState.hero_desc_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
+                        <textarea rows={2} value={settingsState.hero_desc3_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc3_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (AR)" : "Description (AR)"}</label>
+                        <textarea rows={2} value={settingsState.hero_desc3_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc3_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1063,6 +1122,60 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Contact Info Section */}
+              <div>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "معلومات التواصل" : "Contact Info"}</h3>
+                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رقم الهاتف" : "Phone Number"}</label>
+                    <input type="text" value={settingsState.contact_phone || ""} onChange={e => setSettingsState({ ...settingsState, contact_phone: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="+966 ..." />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "البريد الإلكتروني" : "Contact Email"}</label>
+                    <input type="email" value={settingsState.contact_email || ""} onChange={e => setSettingsState({ ...settingsState, contact_email: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="info@..." />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "العنوان" : "Physical Address"}</label>
+                    <input type="text" value={settingsState.contact_address || ""} onChange={e => setSettingsState({ ...settingsState, contact_address: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder={isRtl ? "الرياض، السعودية" : "Riyadh, KSA"} />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رابط جوجل ماب" : "Google Maps Link"}</label>
+                    <input type="text" value={settingsState.contact_maps_url || ""} onChange={e => setSettingsState({ ...settingsState, contact_maps_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://goo.gl/maps/..." />
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button for Settings */}
+              <div style={s({ borderTop: "1px solid var(--border)", paddingTop: 32, marginTop: 16, display: "flex", justifyContent: "flex-end" })}>
+                <button 
+                  onClick={async () => {
+                    setIsSaving(true);
+                    try {
+                      const res = await fetch("/api/settings", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(settingsState),
+                      });
+                      if (res.ok) {
+                        notify(isRtl ? "تم حفظ الإعدادات بنجاح" : "Settings saved successfully");
+                        router.refresh();
+                      } else {
+                        notify(isRtl ? "فشل الحفظ" : "Save failed", "error");
+                      }
+                    } catch (e) {
+                      notify(isRtl ? "خطأ في الاتصال" : "Network error", "error");
+                    } finally {
+                      setIsSaving(false);
+                    }
+                  }} 
+                  className="btn btn-primary" 
+                  disabled={isSaving}
+                  style={s({ padding: "12px 40px", fontSize: 15, opacity: isSaving ? 0.7 : 1 })}
+                >
+                  {isSaving ? "..." : (isRtl ? "حفظ كافة الإعدادات" : "Save All Settings")}
+                </button>
               </div>
 
             </div>

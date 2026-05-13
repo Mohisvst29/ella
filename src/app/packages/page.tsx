@@ -83,9 +83,19 @@ export default function PackagesPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href={`/contact?package=${pkg.tier}`} className={featured ? "btn btn-primary" : "btn btn-outline"} style={{ width: "100%", display: "flex" }}>
+                  <button 
+                    onClick={() => {
+                      const msg = isRtl 
+                        ? `مرحباً، أود حجز باقة (${name}). الرجاء التواصل معي لتأكيد التفاصيل.`
+                        : `Hello, I'm interested in booking the (${name}) package. Please get back to me with details.`;
+                      const phone = "966500000000"; // Fallback, should ideally come from settings
+                      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+                    }}
+                    className={featured ? "btn btn-primary" : "btn btn-outline"} 
+                    style={{ width: "100%", display: "flex", justifyContent: "center" }}
+                  >
                     {featured ? t("packages.bookSignature") : t("packages.reserve")}
-                  </Link>
+                  </button>
                 </div>
               );
             })}

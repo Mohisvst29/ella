@@ -52,14 +52,15 @@ export default function ContactForm() {
     try {
       const r = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (r.ok) {
-        // Construct WhatsApp Message
-        const wpNumber = "966500000000"; // Default or from settings if I had it in props
+        // Redirect to WhatsApp
+        const waNumber = settings?.social_whatsapp || settings?.contact_phone || "966500000000";
+        const cleanNumber = waNumber.replace(/[^0-9]/g, "");
         const msg = isRtl 
-          ? `حجز جديد من الموقع:\n\nالاسم: ${client_name}\nالجوال: ${mobile}\nالمناسبة: ${event_type}\nالموقع: ${venue}\nالباقة: ${pkg}\nالخدمات الإضافية: ${services.join(", ")}\nملاحظات: ${notes}`
-          : `New Booking Request:\n\nName: ${client_name}\nMobile: ${mobile}\nEvent: ${event_type}\nVenue: ${venue}\nPackage: ${pkg}\nAdd-ons: ${services.join(", ")}\nNotes: ${notes}`;
+          ? `طلب حجز جديد:\nالاسم: ${client_name}\nالجوال: ${mobile}\nالمناسبة: ${event_type}\nالباقة: ${pkg}\nالموقع: ${venue}\nملاحظات: ${notes}`
+          : `New Booking Request:\nName: ${client_name}\nMobile: ${mobile}\nEvent: ${event_type}\nPackage: ${pkg}\nLocation: ${venue}\nNotes: ${notes}`;
         
-        const wpUrl = `https://wa.me/${wpNumber}?text=${encodeURIComponent(msg)}`;
-        window.open(wpUrl, "_blank");
+        window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+        
         setDone(true);
       }
       else { const j = await r.json(); setError(isRtl ? "حدث خطأ أثناء الإرسال." : (j.error || "Error occurred.")); }

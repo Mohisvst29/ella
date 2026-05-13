@@ -21,10 +21,11 @@ export async function POST(request: Request) {
     const data = await request.json();
     await connectToDatabase();
     
-    // Generate a simple slug from the English title
-    const slug = (data.title || "untitled")
+    // Generate a simple slug. Support Arabic titles by using a timestamp if English is empty.
+    const titleForSlug = data.title || data.title_ar || "post";
+    const slug = titleForSlug
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/[^a-z0-9\u0600-\u06FF]+/g, "-")
       .replace(/(^-|-$)+/g, "") + "-" + Date.now();
 
     const newPost = await BlogPost.create({
@@ -36,11 +37,11 @@ export async function POST(request: Request) {
       content: data.content || "",
       content_ar: data.content_ar || "",
       image_url: data.image_url || "",
-      category: data.category || "",
-      category_ar: data.category_ar || "",
+      category: data.category || "General",
+      category_ar: data.category_ar || "عام",
       read_time: data.read_time || "5 min read",
       read_time_ar: data.read_time_ar || "5 دقائق قراءة",
-      published: data.published ? 1 : 0
+      published: data.published !== undefined ? (data.published ? 1 : 0) : 1
     });
 
     return NextResponse.json({ success: true, id: newPost._id });
