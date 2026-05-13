@@ -11,11 +11,23 @@ export const metadata: Metadata = {
     "Exclusive female-only wedding photography for the modern Saudi bride. Capturing every whispered secret and luminous moment with cinematic precision.",
 };
 
-export default function HomePage() {
+import connectToDatabase, { GalleryItem } from "@/lib/db";
+
+export default async function HomePage() {
+  await connectToDatabase();
+  const dbItems = await GalleryItem.find().sort({ featured: -1, created_at: -1 }).limit(6).lean();
+  
+  const items = dbItems.map(item => {
+    const id = (item as any)._id.toString();
+    delete (item as any)._id;
+    delete (item as any).__v;
+    return { ...item, id };
+  });
+
   return (
     <div className="page-transition">
       <HeroSection />
-      <FeaturedGallery />
+      <FeaturedGallery items={items} />
       <ServicesSection />
       <PricingTeaser />
       <TestimonialsSection />
