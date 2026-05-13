@@ -33,8 +33,12 @@ export default function Footer() {
         <div className="footer-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 48, marginBottom: 56, textAlign: isRtl ? "right" : "left" }}>
           {/* Brand */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <Link href="/" style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: "var(--pink)" }}>
-              Ayla Media
+            <Link href="/">
+              {settings?.logo_url ? (
+                <img src={settings.logo_url} alt="Ayla Media" style={{ width: settings.logo_width ? `${settings.logo_width}px` : "120px", height: "auto", objectFit: "contain" }} />
+              ) : (
+                <span style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: "var(--pink)" }}>Ayla Media</span>
+              )}
             </Link>
             <p style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.7, maxWidth: 260, margin: isRtl ? "0 0 0 auto" : "0" }}>
               {t("footer.desc")}

@@ -406,7 +406,20 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                 disabled={isSaving}
                 onClick={async () => {
                   setIsSaving(true);
-                  await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(settingsState) });
+                  try {
+                    const res = await fetch("/api/settings", { 
+                      method: "PATCH", 
+                      headers: { "Content-Type": "application/json" }, 
+                      body: JSON.stringify(settingsState) 
+                    });
+                    if (res.ok) {
+                      alert(isRtl ? "تم حفظ جميع التغييرات بنجاح!" : "All changes saved successfully!");
+                    } else {
+                      alert(isRtl ? "فشل الحفظ، يرجى المحاولة مرة أخرى" : "Save failed, please try again");
+                    }
+                  } catch (e) {
+                    alert(isRtl ? "حدث خطأ أثناء الاتصال بالخادم" : "Error connecting to server");
+                  }
                   setIsSaving(false);
                   router.refresh();
                 }}
@@ -507,9 +520,11 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                         <div key={idx} style={{ position: "relative", height: 80, borderRadius: 8, backgroundImage: `url(${imgUrl})`, backgroundSize: "cover", backgroundPosition: "center", border: "1px solid var(--border)" }}>
                           <button 
                             onClick={() => {
-                              const arr = (settingsState.hero_bg_url || "").split(",").filter(Boolean);
-                              arr.splice(idx, 1);
-                              setSettingsState({...settingsState, hero_bg_url: arr.join(",")});
+                              setSettingsState(prev => {
+                                const arr = (prev.hero_bg_url || "").split(",").filter(Boolean);
+                                arr.splice(idx, 1);
+                                return {...prev, hero_bg_url: arr.join(",")};
+                              });
                             }}
                             style={{ position: "absolute", top: -6, right: -6, background: "var(--pink)", color: "#fff", border: "none", width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 12 }}
                           >×</button>
@@ -527,9 +542,11 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                             const res = await fetch("/api/upload", { method: "POST", body: formData });
                             const data = await res.json();
                             if (data.url) {
-                              const arr = (settingsState.hero_bg_url || "").split(",").filter(Boolean);
-                              arr.push(data.url);
-                              setSettingsState({...settingsState, hero_bg_url: arr.join(",")});
+                              setSettingsState(prev => {
+                                const arr = (prev.hero_bg_url || "").split(",").filter(Boolean);
+                                arr.push(data.url);
+                                return {...prev, hero_bg_url: arr.join(",")};
+                              });
                             }
                           } finally {
                             setIsUploading(false);
@@ -540,23 +557,100 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                     <span style={s({ fontSize: 11, color: "var(--text-muted)" })}>{isRtl ? "يمكنك إضافة صورة أو أكثر لتعمل كشريط عرض (Slider)." : "Add one or multiple images to create a slider."}</span>
                   </div>
 
-                  <div style={s({ display: "flex", flexDirection: "column", gap: 8, gridColumn: "1 / -1" })}>
-                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "الخلفية العامة للموقع (Global Background)" : "Global Background Image URL"}</label>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <input 
-                        type="text" 
-                        value={settingsState.global_bg_url || ""} 
-                        onChange={e => setSettingsState({ ...settingsState, global_bg_url: e.target.value })}
-                        style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14, fontFamily: "monospace" })} 
-                        placeholder="https://..."
-                      />
-                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
-                        <span className="icon">upload</span>
-                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleUpload(e, "global_bg_url")} />
-                      </label>
-                    </div>
                     <span style={s({ fontSize: 11, color: "var(--text-muted)" })}>{isRtl ? "تظهر في خلفية كل الصفحات بشكل خافت." : "Subtle parallax background on all pages."}</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Page Content Images */}
+              <div>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "صور أقسام الموقع" : "Section Images"}</h3>
+                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                  
+                  {/* About Hero */}
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة غلاف صفحة (عن أيلة)" : "About Page Hero"}</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input type="text" value={settingsState.about_hero_url || ""} onChange={e => setSettingsState({ ...settingsState, about_hero_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                        <span className="icon">upload</span>
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleUpload(e, "about_hero_url")} />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Pricing Teaser */}
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة قسم الباقات (الرئيسية)" : "Pricing Teaser Image"}</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input type="text" value={settingsState.pricing_teaser_url || ""} onChange={e => setSettingsState({ ...settingsState, pricing_teaser_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                        <span className="icon">upload</span>
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleUpload(e, "pricing_teaser_url")} />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* About Vision */}
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة الرؤية (صفحة عن أيلة)" : "About Vision Image"}</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input type="text" value={settingsState.about_vision_url || ""} onChange={e => setSettingsState({ ...settingsState, about_vision_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                        <span className="icon">upload</span>
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleUpload(e, "about_vision_url")} />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Team 1 */}
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة الفريق 1" : "Team Image 1"}</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input type="text" value={settingsState.about_team_1_url || ""} onChange={e => setSettingsState({ ...settingsState, about_team_1_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                        <span className="icon">upload</span>
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleUpload(e, "about_team_1_url")} />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Team 2 */}
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة الفريق 2" : "Team Image 2"}</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input type="text" value={settingsState.about_team_2_url || ""} onChange={e => setSettingsState({ ...settingsState, about_team_2_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                        <span className="icon">upload</span>
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleUpload(e, "about_team_2_url")} />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Team 3 */}
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة الفريق 3" : "Team Image 3"}</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input type="text" value={settingsState.about_team_3_url || ""} onChange={e => setSettingsState({ ...settingsState, about_team_3_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                        <span className="icon">upload</span>
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleUpload(e, "about_team_3_url")} />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Team 4 */}
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة الفريق 4" : "Team Image 4"}</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input type="text" value={settingsState.about_team_4_url || ""} onChange={e => setSettingsState({ ...settingsState, about_team_4_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                        <span className="icon">upload</span>
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleUpload(e, "about_team_4_url")} />
+                      </label>
+                    </div>
+                  </div>
+
                 </div>
               </div>
 

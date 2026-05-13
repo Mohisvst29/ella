@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import { useSettings } from "@/context/SettingsContext";
 
 export default function AboutPage() {
   const { t, isRtl } = useLanguage();
+  const settings = useSettings();
 
   const teamList = t("about.team") as any[];
 
@@ -13,7 +15,7 @@ export default function AboutPage() {
       <section style={{ position: "relative", minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0 }}>
           <img
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6Sr6W0aL_2WIN21DmaOCATeQ5Zkd_p_UvgLbLYJWXatWYrvoUwzeTzU71IomIX1yDNw-kygUx_NYsYNbpLlJHNUMgKA5Ny_Wszh7f5RX3KgGo1hvUjg8FF9MDk4PLqy976vfEsJrZGh6WZuG82Z1hWkLZYuFFCKJlvoP4c1wIQDy1TlPBETkGEmu9FZvj7t9HN1ta7WlEi11v6l8qFZHiSRhRQGazQ86S7mUS_3wI1eT8jVG7mSzrSj5Tt8LpUr2ow1VgkEFDwMEM"
+            src={settings?.about_hero_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuC6Sr6W0aL_2WIN21DmaOCATeQ5Zkd_p_UvgLbLYJWXatWYrvoUwzeTzU71IomIX1yDNw-kygUx_NYsYNbpLlJHNUMgKA5Ny_Wszh7f5RX3KgGo1hvUjg8FF9MDk4PLqy976vfEsJrZGh6WZuG82Z1hWkLZYuFFCKJlvoP4c1wIQDy1TlPBETkGEmu9FZvj7t9HN1ta7WlEi11v6l8qFZHiSRhRQGazQ86S7mUS_3wI1eT8jVG7mSzrSj5Tt8LpUr2ow1VgkEFDwMEM"}
             alt="About" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.45 }}
           />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent, var(--bg))" }} />
@@ -36,7 +38,7 @@ export default function AboutPage() {
             <div className="reveal-left" style={{ position: "relative" }}>
               <div style={{ borderRadius: "var(--radius)", overflow: "hidden", border: "1px solid var(--border)", padding: 8, background: "var(--surface)" }}>
                 <img
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiIbjHTbKDUe_kwH47A6Fa3rn5g7x-7JWlV7eDKumE6nUePSFpnmQe0VM3o979cPHpO-q0yLAd2WIC3elFtr2Eo2ION8OCzfYspZjH8gurfTLGpXJEOzEdw_gdOJkrsBtX8FQ4eq1qyh0Jht7TsqsIAxN65AI1L9bc2Gx047UBEAuRB2flJx-1yW9TMZSHdxM-5y278Q0UzEaZNbaekRSlkYYd-IJAD1u7v3-cE5dfZyqQoITCY8de21MBEb3P0qw6aaXQ6ioQsi_g"
+                  src={settings?.about_vision_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuAiIbjHTbKDUe_kwH47A6Fa3rn5g7x-7JWlV7eDKumE6nUePSFpnmQe0VM3o979cPHpO-q0yLAd2WIC3elFtr2Eo2ION8OCzfYspZjH8gurfTLGpXJEOzEdw_gdOJkrsBtX8FQ4eq1qyh0Jht7TsqsIAxN65AI1L9bc2Gx047UBEAuRB2flJx-1yW9TMZSHdxM-5y278Q0UzEaZNbaekRSlkYYd-IJAD1u7v3-cE5dfZyqQoITCY8de21MBEb3P0qw6aaXQ6ioQsi_g"}
                   alt="Vision" style={{ width: "100%", height: "auto", borderRadius: "calc(var(--radius) - 8px)" }}
                 />
               </div>
@@ -92,10 +94,10 @@ export default function AboutPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
             {Array.isArray(teamList) && teamList.map((m: any, i: number) => {
               const images = [
-                "https://lh3.googleusercontent.com/aida-public/AB6AXuARSYl-dyL6YPrsdEHG4IP8gQ6MOvp2JrcPs1d_euFGEnKJwuXLlwmKNGgTjlKi2-pP98Bty3-CTif5rqSnY4pLeQeKNyv4s2dju1FDw7LAZhdHqOULMCeEyZC-5omg30ERdACP9yBnt0WBGZnioXWx3C_i7ui9wOVdthM1B-JSWbQ0_OHolskTBkWwoZBjOpzyrg-32o2oEll2uTGfAUWnYQ3PJl-mFAtHOxzxbqk3jK59qcwDmVp5Tas7Org4KoLT4R10vdmDBwss",
-                "https://lh3.googleusercontent.com/aida-public/AB6AXuAHKKUMMEwSYQTJSHHVi6vR9HNDaE04n6YVLU8TwJwEOX3aHW6KH8QtQz_mkOJDu44VL-qTFWzwZimVnouZd3Jso99q0w4lTA8YVRAWHWuJud9IAE586lA7lpSrK9LazrZgV6PYMbORHv3dEoYOb1T0lH2gIlNfnLFAvzAXGIRoq77R2vILBezKjoU3Da1KfS-5v34a43cIxV0U04jogmUV90XJmD07KHvCNG5VIhTM4j7mf2XGHb_yyiWHkY1O2X7AbS_XBhVR3beR",
-                "https://lh3.googleusercontent.com/aida-public/AB6AXuC3KfROc4OkeZUesjuJMPEn8jPfi8_xg_xMitgyw8M5sJTwFVDz3YEiaHP5BifEHV7ESwyoQnuM1IPSykXdvPnZhCTvjo-MJvdFduoCjnY6LH9aNLfbo15Y150NMGI81YTBFR9LJ5Tr4kxeuoGRNQEvgbI-mv0uu6D99OMch_CVF_kA6m1Kv_niun-8dt3VDkm9ALSpJ48Ro466U7fzHmS9QTgUh9u0PJwdU2UBtrVTLWC6qJlDUewFosovZ_XyJ_jx5Noj5AK9Uxng",
-                "https://lh3.googleusercontent.com/aida-public/AB6AXuD6DnM0EtsiNOMQCEpQ2J3hMpqB-q4NrCsNdS2rdS0l0NOEqT267qdr1H2291qmzyNq2bJfLXP6mRCRFUNNSuS3GsDEGKZO-KuIVjuk_lUi619KDDjYNkS763u60T5uSFO59r_-7SVjHIF-cJ3iiIYCG5IyHt9HxiJ_M5OoakhuGqTLgQ0caU7ni5t4EMsBz4IU2O2im-BfgRkCfSQReA5GbFkO4vYGpZ6v-BD3RRUJ6Y87zWR0QjcNCpDDnklv_UzkQKj8tY6ePwe_"
+                settings?.about_team_1_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuARSYl-dyL6YPrsdEHG4IP8gQ6MOvp2JrcPs1d_euFGEnKJwuXLlwmKNGgTjlKi2-pP98Bty3-CTif5rqSnY4pLeQeKNyv4s2dju1FDw7LAZhdHqOULMCeEyZC-5omg30ERdACP9yBnt0WBGZnioXWx3C_i7ui9wOVdthM1B-JSWbQ0_OHolskTBkWwoZBjOpzyrg-32o2oEll2uTGfAUWnYQ3PJl-mFAtHOxzxbqk3jK59qcwDmVp5Tas7Org4KoLT4R10vdmDBwss",
+                settings?.about_team_2_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuAHKKUMMEwSYQTJSHHVi6vR9HNDaE04n6YVLU8TwJwEOX3aHW6KH8QtQz_mkOJDu44VL-qTFWzwZimVnouZd3Jso99q0w4lTA8YVRAWHWuJud9IAE586lA7lpSrK9LazrZgV6PYMbORHv3dEoYOb1T0lH2gIlNfnLFAvzAXGIRoq77R2vILBezKjoU3Da1KfS-5v34a43cIxV0U04jogmUV90XJmD07KHvCNG5VIhTM4j7mf2XGHb_yyiWHkY1O2X7AbS_XBhVR3beR",
+                settings?.about_team_3_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuC3KfROc4OkeZUesjuJMPEn8jPfi8_xg_xMitgyw8M5sJTwFVDz3YEiaHP5BifEHV7ESwyoQnuM1IPSykXdvPnZhCTvjo-MJvdFduoCjnY6LH9aNLfbo15Y150NMGI81YTBFR9LJ5Tr4kxeuoGRNQEvgbI-mv0uu6D99OMch_CVF_kA6m1Kv_niun-8dt3VDkm9ALSpJ48Ro466U7fzHmS9QTgUh9u0PJwdU2UBtrVTLWC6qJlDUewFosovZ_XyJ_jx5Noj5AK9Uxng",
+                settings?.about_team_4_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuD6DnM0EtsiNOMQCEpQ2J3hMpqB-q4NrCsNdS2rdS0l0NOEqT267qdr1H2291qmzyNq2bJfLXP6mRCRFUNNSuS3GsDEGKZO-KuIVjuk_lUi619KDDjYNkS763u60T5uSFO59r_-7SVjHIF-cJ3iiIYCG5IyHt9HxiJ_M5OoakhuGqTLgQ0caU7ni5t4EMsBz4IU2O2im-BfgRkCfSQReA5GbFkO4vYGpZ6v-BD3RRUJ6Y87zWR0QjcNCpDDnklv_UzkQKj8tY6ePwe_"
               ];
               return (
                 <div key={i} className="team-item" style={{ display: "flex", flexDirection: "column", gap: 16, textAlign: isRtl ? "right" : "left" }}>

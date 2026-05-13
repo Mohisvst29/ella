@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import { useSettings } from "@/context/SettingsContext";
 
 export default function PricingTeaser() {
   const { t, isRtl } = useLanguage();
+  const settings = useSettings();
 
   const cols = [
     { num: "01", title: t("investment.list.0.title"), desc: t("investment.list.0.desc") },
@@ -51,7 +53,7 @@ export default function PricingTeaser() {
             <div style={{ position: "absolute", top: -40, [isRtl ? 'right' : 'left']: -40, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,176,204,0.2), transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
             <div style={{ borderRadius: "var(--radius)", overflow: "hidden", border: "1px solid var(--border)", padding: 6, background: "var(--surface)" }}>
               <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFWsnJluTeMdkvTJSTwdMAoznM9M55Cti8ADXO01_XtdmOPsbCsAuzQEQ8MoWQyj31oR-356IB_u41obyVds-o4_Xvvo-QISyMzO2-LytDHkW8bTm3pZMkZOrL45fgF6Jhsb3nhV6qO4Koo1m1NNlEbVIp69Fgo6E8A2-ZhHcC_GMllFy3iQuFvbcmsjPw4izBsrET6GQQEeBMpzu75kLZjyelB15OR_3GESk5BM2-2YO4jwFwKs0HhivjC022i_SpSiJPOBcSTBGU"
+                src={settings?.pricing_teaser_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuAFWsnJluTeMdkvTJSTwdMAoznM9M55Cti8ADXO01_XtdmOPsbCsAuzQEQ8MoWQyj31oR-356IB_u41obyVds-o4_Xvvo-QISyMzO2-LytDHkW8bTm3pZMkZOrL45fgF6Jhsb3nhV6qO4Koo1m1NNlEbVIp69Fgo6E8A2-ZhHcC_GMllFy3iQuFvbcmsjPw4izBsrET6GQQEeBMpzu75kLZjyelB15OR_3GESk5BM2-2YO4jwFwKs0HhivjC022i_SpSiJPOBcSTBGU"}
                 alt="Luxury Package" style={{ width: "100%", maxHeight: 480, objectFit: "cover", borderRadius: 12, display: "block" }}
               />
             </div>
