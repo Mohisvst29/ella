@@ -618,7 +618,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                     />
                   </div>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
-                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>X (Twitter)</label>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>X / Twitter</label>
                     <input 
                       type="text" 
                       value={settingsState.social_x || ""} 
