@@ -204,15 +204,22 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                         </td>
                         <td style={s({ padding: "16px 20px" })}>
                           <div style={s({ display: "flex", gap: 8, justifyContent: isRtl ? "flex-end" : "flex-start" })}>
-                            <button onClick={() => setSelected(b)} style={s({ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", color: "var(--text-muted)", cursor: "pointer" })}>
-                              <span className="icon" style={{ fontSize: 16 }}>more_horiz</span>
-                            </button>
-                            <button 
-                              onClick={() => updateStatus(b.id, b.status === 'confirmed' ? 'pending' : 'confirmed')} 
+                            <select 
+                              value={b.status} 
+                              onChange={(e) => updateStatus(b.id, e.target.value)}
                               disabled={busy === b.id}
-                              style={s({ width: 32, height: 32, borderRadius: 8, background: "rgba(255,126,179,0.1)", border: "1px solid var(--pink)", color: "var(--pink)", cursor: "pointer", opacity: busy === b.id ? 0.5 : 1 })}
+                              style={s({ 
+                                padding: "4px 8px", borderRadius: 6, fontSize: 11, fontWeight: 700, 
+                                background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", 
+                                color: "var(--text)", cursor: "pointer", appearance: "none", textAlign: "center"
+                              })}
                             >
-                              <span className="icon" style={{ fontSize: 16 }}>{b.status === 'confirmed' ? 'undo' : 'check'}</span>
+                              {Object.entries(statusMap).map(([k, v]) => (
+                                <option key={k} value={k} style={{background: "#1a1114"}}>{v.label}</option>
+                              ))}
+                            </select>
+                            <button onClick={() => setSelected(b)} style={s({ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", color: "var(--text-muted)", cursor: "pointer" })}>
+                              <span className="icon" style={{ fontSize: 16 }}>visibility</span>
                             </button>
                           </div>
                         </td>
@@ -240,13 +247,18 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                     <div style={s({ fontSize: 12, color: "var(--text-dim)", marginTop: 4 })}>{item.category} • {item.year}</div>
                   </div>
                   <button 
+                    onClick={() => setAddingGalleryImage({...item})}
+                    style={{ position: "absolute", top: 8, [isRtl ? 'left' : 'right']: 8, background: "rgba(0,0,0,0.6)", color: "var(--pink)", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                    <span className="icon" style={{ fontSize: 18 }}>edit</span>
+                  </button>
+                  <button 
                     onClick={async () => {
                       if(confirm(isRtl ? "هل أنت متأكد من حذف هذه الصورة؟" : "Are you sure you want to delete this image?")) {
                         await fetch(`/api/gallery/${item.id}`, { method: 'DELETE' });
                         router.refresh();
                       }
                     }}
-                    style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.6)", color: "#ff4d4d", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                    style={{ position: "absolute", top: 8, [isRtl ? 'right' : 'left']: 8, background: "rgba(0,0,0,0.6)", color: "#ff4d4d", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                     <span className="icon" style={{ fontSize: 18 }}>delete</span>
                   </button>
                 </div>
@@ -306,7 +318,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           <div>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{t("admin.pricing")}</h2>
-              <button className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ باقة جديدة</button>
+              <button onClick={() => setEditingPackage({ name: "", name_ar: "", price: 0, description: "", description_ar: "", features: [], features_ar: [] })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ باقة جديدة</button>
             </div>
             <div style={s({ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 })}>
               {packages.map((pkg: any) => (
@@ -776,13 +788,13 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
         </div>
       )}
 
-      {/* Package Edit Modal */}
+      {/* Package Modal */}
       {editingPackage && (
         <div style={s({ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 16px" })}>
           <div style={s({ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" })} onClick={() => setEditingPackage(null)} />
-          <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: 600, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 32, maxHeight: "90vh", overflowY: "auto" })}>
+          <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: 650, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 32, maxHeight: "90vh", overflowY: "auto" })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
-              <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>تعديل الباقة</h3>
+              <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{editingPackage.id ? (isRtl ? "تعديل الباقة" : "Edit Package") : (isRtl ? "باقة جديدة" : "New Package")}</h3>
               <button onClick={() => setEditingPackage(null)} style={s({ color: "var(--text-muted)", cursor: "pointer", background: "none", border: "none" })}>
                 <span className="icon">close</span>
               </button>
@@ -801,17 +813,17 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
               </div>
 
               <div>
-                <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>السعر (ريال)</label>
+                <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "السعر (SAR)" : "Price (SAR)"}</label>
                 <input type="number" value={editingPackage.price} onChange={e => setEditingPackage({...editingPackage, price: Number(e.target.value)})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
               </div>
 
               <div style={s({ display: "flex", gap: 16, flexDirection: isRtl ? "row-reverse" : "row" })}>
                 <div style={s({ flex: 1 })}>
-                  <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>الوصف (إنجليزي)</label>
+                  <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "الوصف (إنجليزي)" : "Description (EN)"}</label>
                   <textarea rows={3} value={editingPackage.description || ""} onChange={e => setEditingPackage({...editingPackage, description: e.target.value})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
                 </div>
                 <div style={s({ flex: 1 })}>
-                  <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>الوصف (عربي)</label>
+                  <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "الوصف (عربي)" : "Description (AR)"}</label>
                   <textarea rows={3} value={editingPackage.description_ar || ""} onChange={e => setEditingPackage({...editingPackage, description_ar: e.target.value})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
                 </div>
               </div>
@@ -875,15 +887,18 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                 <button 
                   onClick={async () => {
                     setIsSaving(true);
-                    await fetch(`/api/packages/${editingPackage.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(editingPackage) });
+                    const method = editingPackage.id ? "PATCH" : "POST";
+                    const url = editingPackage.id ? `/api/packages/${editingPackage.id}` : "/api/packages";
+                    await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(editingPackage) });
                     setIsSaving(false);
                     setEditingPackage(null);
                     router.refresh();
                   }} 
                   className="btn btn-primary" 
-                  style={s({ padding: "8px 24px", fontSize: 13 })}
+                  style={s({ padding: "8px 24px", fontSize: 13, opacity: isSaving ? 0.5 : 1 })}
+                  disabled={isSaving}
                 >
-                  {isSaving ? "..." : "حفظ التغييرات"}
+                  {isSaving ? "..." : (isRtl ? "حفظ" : "Save")}
                 </button>
               </div>
             </div>
