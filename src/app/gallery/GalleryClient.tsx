@@ -8,6 +8,7 @@ interface GalleryItem { id: number; title: string; category: string; image_url: 
 export default function GalleryClient({ items, categories }: { items: GalleryItem[]; categories: string[] }) {
   const { t, isRtl } = useLanguage();
   const [active, setActive] = useState(t("gallery.all"));
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   
   const allLabel = t("gallery.all");
   const filtered = active === allLabel ? items : items.filter(i => i.category === active);
@@ -47,8 +48,19 @@ export default function GalleryClient({ items, categories }: { items: GalleryIte
       <div className="container">
         <div className="masonry reveal">
           {filtered.map(item => (
-            <div key={item.id} className="masonry-item gallery-card" style={{ position: "relative", overflow: "hidden", borderRadius: "var(--radius)", cursor: "pointer" }}>
-              <img src={item.image_url} alt={item.title} loading="lazy" className="gallery-img" style={{ width: "100%", height: "auto", display: "block", transition: "transform 0.6s ease" }} />
+            <div 
+              key={item.id} 
+              className="masonry-item gallery-card" 
+              onClick={() => setSelectedImage(item.image_url)}
+              style={{ position: "relative", overflow: "hidden", borderRadius: "var(--radius)", cursor: "pointer" }}
+            >
+              <img 
+                src={item.image_url} 
+                alt={item.title} 
+                loading="lazy" 
+                className="gallery-img bw-to-color" 
+                style={{ width: "100%", height: "auto", display: "block", transition: "all 0.6s ease" }} 
+              />
               <div className="gallery-overlay" style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%)", opacity: 0, transition: "opacity 0.3s", pointerEvents: "none", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 20, textAlign: isRtl ? "right" : "left" }}>
                 {item.location && <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--pink)", marginBottom: 4 }}>{item.location} {item.year && `, ${item.year}`}</span>}
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "#fff" }}>{item.title}</h3>
@@ -57,6 +69,26 @@ export default function GalleryClient({ items, categories }: { items: GalleryIte
             </div>
           ))}
         </div>
+
+        {/* Lightbox */}
+        {selectedImage && (
+          <div 
+            onClick={() => setSelectedImage(null)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 40, cursor: "zoom-out" }}
+          >
+            <img 
+              src={selectedImage} 
+              alt="Full Size" 
+              style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: 8, boxShadow: "0 0 50px rgba(0,0,0,0.5)" }} 
+            />
+            <button 
+              onClick={() => setSelectedImage(null)}
+              style={{ position: "absolute", top: 30, right: 30, background: "none", border: "none", color: "#fff", cursor: "pointer" }}
+            >
+              <span className="icon" style={{ fontSize: 40 }}>close</span>
+            </button>
+          </div>
+        )}
         <div style={{ textAlign: "center", marginTop: 52 }}>
           <button className="btn btn-outline">{t("gallery.loadMore")}</button>
         </div>

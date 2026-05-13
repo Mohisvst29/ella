@@ -333,3 +333,17 @@ textarea { resize: vertical; }
 .masonry-item { break-inside: avoid; margin-bottom: 20px; }
 @media (max-width: 900px) { .masonry { columns: 2; } }
 @media (max-width: 600px) { .masonry { columns: 1; } }
+
+/* ── Gallery Effects ─────────────────────────── */
+.bw-to-color {
+  filter: grayscale(100%);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gallery-card:hover .bw-to-color {
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+.gallery-card:hover .gallery-overlay {
+  opacity: 1 !important;
+}
+

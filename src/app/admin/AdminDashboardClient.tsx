@@ -234,7 +234,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
             <div style={s({ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 })}>
               {galleryItems.map((item: any) => (
                 <div key={item.id} style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden", position: "relative" })}>
-                  <div style={s({ height: 160, backgroundImage: `url(${item.image_url})`, backgroundSize: "cover", backgroundPosition: "center" })} />
+                  <div style={s({ height: 160, backgroundImage: `url(${item.image_url})`, backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundColor: "rgba(0,0,0,0.1)" })} />
                   <div style={s({ padding: 12 })}>
                     <div style={s({ fontSize: 14, fontWeight: 600 })}>{item.title}</div>
                     <div style={s({ fontSize: 12, color: "var(--text-dim)", marginTop: 4 })}>{item.category} • {item.year}</div>
@@ -926,7 +926,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                     }} />
                   </label>
                 </div>
-                {addingGalleryImage.image_url && <div style={{ marginTop: 12, height: 120, backgroundImage: `url(${addingGalleryImage.image_url})`, backgroundSize: "cover", backgroundPosition: "center", borderRadius: 8 }} />}
+                {addingGalleryImage.image_url && <div style={{ marginTop: 12, height: 120, backgroundImage: `url(${addingGalleryImage.image_url})`, backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center", borderRadius: 8, backgroundColor: "rgba(0,0,0,0.1)" }} />}
               </div>
 
               <div>
