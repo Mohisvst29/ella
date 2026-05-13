@@ -557,10 +557,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                     <span style={s({ fontSize: 11, color: "var(--text-muted)" })}>{isRtl ? "يمكنك إضافة صورة أو أكثر لتعمل كشريط عرض (Slider)." : "Add one or multiple images to create a slider."}</span>
                   </div>
 
-                    <span style={s({ fontSize: 11, color: "var(--text-muted)" })}>{isRtl ? "تظهر في خلفية كل الصفحات بشكل خافت." : "Subtle parallax background on all pages."}</span>
-                  </div>
-                </div>
-              </div>
+
 
               {/* Page Content Images */}
               <div>
@@ -753,8 +750,10 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
 
             </div>
           </div>
-        )}
-      </main>
+        </div>
+      </div>
+    )}
+  </main>
 
       {/* Booking Details Modal */}
       {selected && (
