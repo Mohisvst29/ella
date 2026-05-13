@@ -234,6 +234,7 @@ const BookingSchema = new mongoose.Schema({
   mobile: { type: String, required: true },
   email: String,
   event_type: { type: String, required: true },
+  event_date: String,
   venue_location: String,
   package: { type: String, required: true },
   additional_services: String,

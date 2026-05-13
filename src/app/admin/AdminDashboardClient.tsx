@@ -305,7 +305,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
               <table style={s({ width: "100%", borderCollapse: "collapse", textAlign: isRtl ? "right" : "left" })}>
                 <thead>
                   <tr style={s({ background: "rgba(255,255,255,0.02)" })}>
-                    {[t("admin.client"), t("admin.date"), t("contact.form.package"), t("admin.status"), t("admin.action")].map(h => (
+                    {[t("admin.client"), t("admin.date"), isRtl ? "موعد المناسبة" : "Event Date", t("contact.form.package"), t("admin.status"), t("admin.action")].map(h => (
                       <th key={h} style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-dim)" })}>{h}</th>
                     ))}
                   </tr>
@@ -322,6 +322,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                           <div style={s({ fontSize: 12, color: "var(--text-dim)", marginTop: 2 })}>{b.mobile}</div>
                         </td>
                         <td style={s({ padding: "16px 20px", fontSize: 13, color: "var(--text-muted)" })}>{new Date(b.created_at).toLocaleDateString(isRtl ? "ar-SA" : "en-US")}</td>
+                        <td style={s({ padding: "16px 20px", fontSize: 13, color: "#fff", fontWeight: 600 })}>{b.event_date || "-"}</td>
                         <td style={s({ padding: "16px 20px", fontSize: 13, color: "var(--pink)", textTransform: "capitalize", fontWeight: 600 })}>{b.package}</td>
                         <td style={s({ padding: "16px 20px" })}>
                           <span style={s({ padding: "4px 12px", borderRadius: 20, fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", background: st.bg, color: st.color })}>{st.label}</span>
@@ -1193,8 +1194,12 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
             {[
               [t("admin.client"), selected.client_name], 
               [t("contact.form.mobile"), selected.mobile], 
+              [isRtl ? "موعد المناسبة" : "Event Date", selected.event_date || "—"],
+              [t("contact.form.package"), selected.package],
               [t("contact.form.email"), selected.email||"—"], 
-              [t("contact.form.eventType"), selected.event_type]
+              [t("contact.form.eventType"), selected.event_type],
+              [isRtl ? "الموقع" : "Location", selected.venue_location || "—"],
+              [isRtl ? "ملاحظات" : "Notes", selected.notes || "—"]
             ].map(([l, v]) => (
               <div key={l as string} style={s({ display: "flex", gap: 16, marginBottom: 14, flexDirection: isRtl ? "row-reverse" : "row" })}>
                 <span style={s({ fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)", width: 100, flexShrink: 0 })}>{l}</span>

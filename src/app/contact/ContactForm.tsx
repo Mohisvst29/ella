@@ -45,6 +45,7 @@ export default function ContactForm() {
       mobile, 
       email: fd.get("email"), 
       event_type, 
+      event_date: fd.get("event_date"),
       venue_location: venue, 
       package: pkg, 
       additional_services: services.join(", "), 
@@ -57,9 +58,10 @@ export default function ContactForm() {
         // Redirect to WhatsApp
         const waNumber = settings?.social_whatsapp || settings?.contact_phone || "966500000000";
         const cleanNumber = waNumber.replace(/[^0-9]/g, "");
+        const eventDate = fd.get("event_date") as string;
         const msg = isRtl 
-          ? `طلب حجز جديد:\nالاسم: ${client_name}\nالجوال: ${mobile}\nالمناسبة: ${event_type}\nالباقة: ${pkg}\nالموقع: ${venue}\nملاحظات: ${notes}`
-          : `New Booking Request:\nName: ${client_name}\nMobile: ${mobile}\nEvent: ${event_type}\nPackage: ${pkg}\nLocation: ${venue}\nNotes: ${notes}`;
+          ? `طلب حجز جديد:\nالاسم: ${client_name}\nالجوال: ${mobile}\nالتاريخ: ${eventDate}\nالمناسبة: ${event_type}\nالباقة: ${pkg}\nالموقع: ${venue}\nملاحظات: ${notes}`
+          : `New Booking Request:\nName: ${client_name}\nMobile: ${mobile}\nDate: ${eventDate}\nEvent: ${event_type}\nPackage: ${pkg}\nLocation: ${venue}\nNotes: ${notes}`;
         
         window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
         
@@ -154,7 +156,10 @@ export default function ContactForm() {
                   </select>
                 </div>
               </div>
-              {field(t("contact.form.venue"), "venue_location", "url", t("contact.form.placeholders.venue"))}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                {field(isRtl ? "تاريخ المناسبة" : "Event Date", "event_date", "date")}
+                {field(t("contact.form.venue"), "venue_location", "text", t("contact.form.placeholders.venue"))}
+              </div>
 
               {/* Package */}
               <div>
