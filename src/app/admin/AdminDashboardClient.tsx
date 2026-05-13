@@ -1468,109 +1468,108 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           </div>
         </div>
       )}
+      {/* Service Modal */}
+      {editingService && (
+        <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
+          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 600, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingService.id ? (isRtl ? "تعديل خدمة" : "Edit Service") : (isRtl ? "إضافة خدمة" : "Add Service")}</h3>
+              <button onClick={() => setEditingService(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
+                <span className="icon">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={saveService} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
+                  <input required type="text" value={editingService.title || ""} onChange={e => setEditingService({ ...editingService, title: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (AR)" : "Title (AR)"}</label>
+                  <input required type="text" value={editingService.title_ar || ""} onChange={e => setEditingService({ ...editingService, title_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
+                  <textarea rows={3} value={editingService.desc || ""} onChange={e => setEditingService({ ...editingService, desc: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (AR)" : "Description (AR)"}</label>
+                  <textarea rows={3} value={editingService.desc_ar || ""} onChange={e => setEditingService({ ...editingService, desc_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة الخدمة" : "Service Image"}</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input type="text" value={editingService.image_url || ""} onChange={e => setEditingService({ ...editingService, image_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                  <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                    <span className="icon">upload</span>
+                    <input type="file" accept="image/*" style={{ display: "none" }} onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setIsUploading(true);
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      try {
+                        const res = await fetch("/api/upload", { method: "POST", body: formData });
+                        const data = await res.json();
+                        if (data.url) setEditingService({ ...editingService, image_url: data.url });
+                      } finally {
+                        setIsUploading(false);
+                      }
+                    }} />
+                  </label>
+                </div>
+              </div>
+
+              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                <button type="button" onClick={() => setEditingService(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
+                <button type="submit" disabled={isSaving || isUploading} className="btn btn-primary">
+                  {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Service")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Addon Modal */}
+      {editingAddon && (
+        <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
+          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 500, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingAddon.id ? (isRtl ? "تعديل خيار" : "Edit Option") : (isRtl ? "إضافة خيار" : "Add Option")}</h3>
+              <button onClick={() => setEditingAddon(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
+                <span className="icon">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={saveAddon} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+              <div style={s({ display: "flex", flexDirection: "column", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم الخيار (EN)" : "Option Name (EN)"}</label>
+                  <input required type="text" value={editingAddon.name || ""} onChange={e => setEditingAddon({ ...editingAddon, name: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم الخيار (AR)" : "Option Name (AR)"}</label>
+                  <input required type="text" value={editingAddon.name_ar || ""} onChange={e => setEditingAddon({ ...editingAddon, name_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                <button type="button" onClick={() => setEditingAddon(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
+                <button type="submit" disabled={isSaving} className="btn btn-primary">
+                  {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Option")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-{/* Service Modal */}
-{editingService && (
-  <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
-    <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 600, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
-      <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
-        <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingService.id ? (isRtl ? "تعديل خدمة" : "Edit Service") : (isRtl ? "إضافة خدمة" : "Add Service")}</h3>
-        <button onClick={() => setEditingService(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
-          <span className="icon">close</span>
-        </button>
-      </div>
-
-      <form onSubmit={saveService} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-        <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
-          <div>
-            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
-            <input required type="text" value={editingService.title || ""} onChange={e => setEditingService({ ...editingService, title: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
-          </div>
-          <div>
-            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (AR)" : "Title (AR)"}</label>
-            <input required type="text" value={editingService.title_ar || ""} onChange={e => setEditingService({ ...editingService, title_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
-          </div>
-        </div>
-
-        <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
-          <div>
-            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
-            <textarea rows={3} value={editingService.desc || ""} onChange={e => setEditingService({ ...editingService, desc: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
-          </div>
-          <div>
-            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (AR)" : "Description (AR)"}</label>
-            <textarea rows={3} value={editingService.desc_ar || ""} onChange={e => setEditingService({ ...editingService, desc_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
-          </div>
-        </div>
-
-        <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
-          <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة الخدمة" : "Service Image"}</label>
-          <div style={{ display: "flex", gap: 8 }}>
-            <input type="text" value={editingService.image_url || ""} onChange={e => setEditingService({ ...editingService, image_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
-            <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
-              <span className="icon">upload</span>
-              <input type="file" accept="image/*" style={{ display: "none" }} onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                setIsUploading(true);
-                const formData = new FormData();
-                formData.append("file", file);
-                try {
-                  const res = await fetch("/api/upload", { method: "POST", body: formData });
-                  const data = await res.json();
-                  if (data.url) setEditingService({ ...editingService, image_url: data.url });
-                } finally {
-                  setIsUploading(false);
-                }
-              }} />
-            </label>
-          </div>
-        </div>
-
-        <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
-          <button type="button" onClick={() => setEditingService(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
-          <button type="submit" disabled={isSaving || isUploading} className="btn btn-primary">
-            {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Service")}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
-{/* Addon Modal */}
-{editingAddon && (
-  <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
-    <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 500, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
-      <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
-        <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingAddon.id ? (isRtl ? "تعديل خيار" : "Edit Option") : (isRtl ? "إضافة خيار" : "Add Option")}</h3>
-        <button onClick={() => setEditingAddon(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
-          <span className="icon">close</span>
-        </button>
-      </div>
-
-      <form onSubmit={saveAddon} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-        <div style={s({ display: "flex", flexDirection: "column", gap: 16 })}>
-          <div>
-            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم الخيار (EN)" : "Option Name (EN)"}</label>
-            <input required type="text" value={editingAddon.name || ""} onChange={e => setEditingAddon({ ...editingAddon, name: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
-          </div>
-          <div>
-            <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم الخيار (AR)" : "Option Name (AR)"}</label>
-            <input required type="text" value={editingAddon.name_ar || ""} onChange={e => setEditingAddon({ ...editingAddon, name_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
-          </div>
-        </div>
-
-        <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
-          <button type="button" onClick={() => setEditingAddon(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
-          <button type="submit" disabled={isSaving} className="btn btn-primary">
-            {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Option")}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
