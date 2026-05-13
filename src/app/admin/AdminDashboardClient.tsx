@@ -17,6 +17,9 @@ interface AdminProps {
   settings?: Record<string, string>;
 }
 
+const englishFonts = ["Playfair Display", "Inter", "Roboto", "Montserrat", "Cinzel", "Cormorant Garamond", "Libre Baskerville", "Bodoni Moda", "Prata"];
+const arabicFonts = ["Tajawal", "Cairo", "Almarai", "Amiri", "Reem Kufi", "El Messiri", "Changa", "Harmattan", "Lalezar"];
+
 export default function AdminDashboardClient({ bookings, stats, galleryItems = [], blogPosts = [], packages = [], subscribers = [], settings = {} }: AdminProps) {
   const { t, isRtl } = useLanguage();
   const router = useRouter();
@@ -452,21 +455,25 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                 <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "الخط الإنجليزي الأساسي" : "Primary English Font"}</label>
-                    <input 
-                      type="text" 
+                    <select 
                       value={settingsState.font_en || "Playfair Display"} 
                       onChange={e => setSettingsState({ ...settingsState, font_en: e.target.value })}
-                      style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} 
-                    />
+                      style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14, appearance: "none" })}
+                    >
+                      {englishFonts.map(f => <option key={f} value={f} style={{background: "#1a1114"}}>{f}</option>)}
+                      {!englishFonts.includes(settingsState.font_en || "") && settingsState.font_en && <option value={settingsState.font_en}>{settingsState.font_en} (Custom)</option>}
+                    </select>
                   </div>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "الخط العربي الأساسي" : "Primary Arabic Font"}</label>
-                    <input 
-                      type="text" 
+                    <select 
                       value={settingsState.font_ar || "Tajawal"} 
                       onChange={e => setSettingsState({ ...settingsState, font_ar: e.target.value })}
-                      style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} 
-                    />
+                      style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14, appearance: "none" })}
+                    >
+                      {arabicFonts.map(f => <option key={f} value={f} style={{background: "#1a1114"}}>{f}</option>)}
+                      {!arabicFonts.includes(settingsState.font_ar || "") && settingsState.font_ar && <option value={settingsState.font_ar}>{settingsState.font_ar} (Custom)</option>}
+                    </select>
                   </div>
                 </div>
               </div>
