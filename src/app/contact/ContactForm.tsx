@@ -3,9 +3,11 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import { useSettings } from "@/context/SettingsContext";
 
 export default function ContactForm() {
   const { t, isRtl } = useLanguage();
+  const settings = useSettings();
   const searchParams = useSearchParams();
   const [pkg, setPkg] = useState(searchParams.get("package") || "essential");
   const [services, setServices] = useState<string[]>([]);
