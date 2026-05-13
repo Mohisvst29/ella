@@ -1,28 +1,23 @@
 import { NextResponse } from "next/server";
-import getDb from "@/lib/db";
+import connectToDatabase, { GalleryItem } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const db = getDb();
+    await connectToDatabase();
     
-    const stmt = db.prepare(`
-      INSERT INTO gallery_items (title, category, image_url, location, year, featured)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
+    const newItem = await GalleryItem.create({
+      title: data.title || "Untitled",
+      category: data.category || "Wedding",
+      image_url: data.image_url || "",
+      location: data.location || "",
+      year: data.year || new Date().getFullYear(),
+      featured: data.featured ? 1 : 0
+    });
 
-    const result = stmt.run(
-      data.title || "Untitled",
-      data.category || "Wedding",
-      data.image_url,
-      data.location || "",
-      data.year || new Date().getFullYear(),
-      data.featured ? 1 : 0
-    );
-
-    return NextResponse.json({ success: true, id: result.lastInsertRowid });
+    return NextResponse.json({ success: true, id: newItem._id });
   } catch (error) {
-    console.error("Error adding gallery item:", error);
-    return NextResponse.json({ error: "Failed to add gallery item" }, { status: 500 });
+    console.error("Error creating gallery item:", error);
+    return NextResponse.json({ error: "Failed to add item" }, { status: 500 });
   }
 }

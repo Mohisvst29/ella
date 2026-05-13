@@ -1,66 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
-import getDb from "@/lib/db";
+import { NextResponse } from "next/server";
+import connectToDatabase, { Booking } from "@/lib/db";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const {
-      client_name,
-      mobile,
-      email,
-      event_type,
-      venue_location,
-      package: pkg,
-      additional_services,
-      notes,
-    } = body;
+    const data = await request.json();
+    await connectToDatabase();
+    
+    await Booking.create({
+      client_name: data.client_name,
+      mobile: data.mobile,
+      email: data.email || "",
+      event_type: data.event_type,
+      venue_location: data.venue_location || "",
+      package: data.package,
+      additional_services: data.additional_services || "",
+      notes: data.notes || "",
+      status: "pending"
+    });
 
-    if (!client_name || !mobile || !event_type || !pkg) {
-      return NextResponse.json(
-        { error: "Required fields are missing." },
-        { status: 400 }
-      );
-    }
-
-    const db = getDb();
-    const stmt = db.prepare(`
-      INSERT INTO bookings (client_name, mobile, email, event_type, venue_location, package, additional_services, notes, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-    `);
-
-    const result = stmt.run(
-      client_name,
-      mobile,
-      email || null,
-      event_type,
-      venue_location || null,
-      pkg,
-      additional_services || null,
-      notes || null
-    );
-
-    return NextResponse.json(
-      { success: true, id: result.lastInsertRowid },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Booking error:", error);
-    return NextResponse.json(
-      { error: "Failed to create booking." },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    const db = getDb();
-    const bookings = db
-      .prepare("SELECT * FROM bookings ORDER BY created_at DESC")
-      .all();
-    return NextResponse.json({ bookings });
-  } catch (error) {
-    console.error("Get bookings error:", error);
-    return NextResponse.json({ error: "Failed to fetch bookings." }, { status: 500 });
+    return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
   }
 }

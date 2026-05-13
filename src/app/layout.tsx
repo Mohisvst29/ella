@@ -7,7 +7,7 @@ import ScrollReveal from "@/components/layout/ScrollReveal";
 import CinematicScroll from "@/components/layout/CinematicScroll";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { SettingsProvider } from "@/context/SettingsContext";
-import getDb from "@/lib/db";
+import connectToDatabase, { SiteSetting } from "@/lib/db";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -29,11 +29,11 @@ export const metadata: Metadata = {
   description: "Saudi Arabia's premier female-only wedding photography studio. Cinematic, editorial, and deeply private.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const db = getDb();
-  const dbSettings = db.prepare("SELECT * FROM site_settings").all() as { key: string, value: string }[];
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  await connectToDatabase();
+  const dbSettings = await SiteSetting.find().lean();
   const settings: Record<string, string> = {};
-  dbSettings.forEach(s => { settings[s.key] = s.value; });
+  dbSettings.forEach((s: any) => { settings[s.key] = s.value; });
 
   const fontEn = settings.font_en || "Playfair Display";
   const fontAr = settings.font_ar || "Tajawal";

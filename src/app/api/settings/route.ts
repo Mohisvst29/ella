@@ -1,23 +1,21 @@
 import { NextResponse } from "next/server";
-import getDb from "@/lib/db";
+import connectToDatabase, { SiteSetting } from "@/lib/db";
 
 export async function PATCH(request: Request) {
   try {
     const data = await request.json();
-    const db = getDb();
+    await connectToDatabase();
     
-    // data should be an object of key-value pairs
-    const stmt = db.prepare("UPDATE site_settings SET value = ? WHERE key = ?");
-    const insertStmt = db.prepare("INSERT OR REPLACE INTO site_settings (key, value) VALUES (?, ?)");
-    
-    // We run in a transaction for safety
-    const transaction = db.transaction((settings: Record<string, string>) => {
-      for (const [key, value] of Object.entries(settings)) {
-         insertStmt.run(value, key);
-      }
+    // We update each setting or create it if it doesn't exist
+    const promises = Object.entries(data).map(([key, value]) => {
+      return SiteSetting.findOneAndUpdate(
+        { key },
+        { value: value as string },
+        { upsert: true, new: true }
+      );
     });
 
-    transaction(data);
+    await Promise.all(promises);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -1,73 +1,57 @@
-import getDb from "@/lib/db";
+import connectToDatabase, { Booking, Package, GalleryItem, BlogPost, SiteSetting, NewsletterSubscriber } from "@/lib/db";
 import AdminDashboardClient from "./AdminDashboardClient";
 
 export const dynamic = "force-dynamic";
 
-interface Booking {
-  id: number;
-  client_name: string;
-  mobile: string;
-  email: string | null;
-  event_type: string;
-  venue_location: string | null;
-  package: string;
-  additional_services: string | null;
-  notes: string | null;
-  status: string;
-  created_at: string;
-}
+export default async function AdminPage() {
+  await connectToDatabase();
 
-export default function AdminPage() {
-  const db = getDb();
-
-  const bookings = db
-    .prepare("SELECT * FROM bookings ORDER BY created_at DESC")
-    .all() as Booking[];
-
+  const bookings = await Booking.find().sort({ created_at: -1 }).lean();
+  
   // Fetch real package prices from DB
-  const dbPackages = db.prepare("SELECT tier, price FROM packages").all() as { tier: string; price: number }[];
+  const dbPackages = await Package.find({}, 'tier price').lean();
   const packagePrices: Record<string, number> = {};
   dbPackages.forEach(p => {
-    packagePrices[p.tier] = p.price;
+    packagePrices[(p as any).tier] = (p as any).price;
   });
 
   const totalBookings = bookings.length;
-  const pendingBookings = bookings.filter((b) => b.status === "pending").length;
-  const confirmedBookings = bookings.filter((b) => b.status === "confirmed").length;
-  const newToday = bookings.filter((b) => {
+  const pendingBookings = bookings.filter((b: any) => b.status === "pending").length;
+  const confirmedBookings = bookings.filter((b: any) => b.status === "confirmed").length;
+  const newToday = bookings.filter((b: any) => {
     const today = new Date().toISOString().split('T')[0];
     const bDate = new Date(b.created_at).toISOString().split('T')[0];
     return bDate === today;
   }).length;
 
   const revenue = bookings
-    .filter((b) => b.status === "confirmed" || b.status === "completed")
-    .reduce((sum, b) => sum + (packagePrices[b.package] || 0), 0);
+    .filter((b: any) => b.status === "confirmed" || b.status === "completed")
+    .reduce((sum, b: any) => sum + (packagePrices[b.package] || 0), 0);
 
-  const galleryCount = (
-    db.prepare("SELECT COUNT(*) as count FROM gallery_items").get() as { count: number }
-  ).count;
+  const galleryCount = await GalleryItem.countDocuments();
+  const blogCount = await BlogPost.countDocuments({ published: 1 });
+  const subscriberCount = await NewsletterSubscriber.countDocuments();
 
-  const blogCount = (
-    db.prepare("SELECT COUNT(*) as count FROM blog_posts WHERE published = 1").get() as { count: number }
-  ).count;
-
-  const subscriberCount = (
-    db.prepare("SELECT COUNT(*) as count FROM newsletter_subscribers").get() as { count: number }
-  ).count;
-
-  const galleryItems = db.prepare("SELECT * FROM gallery_items ORDER BY created_at DESC").all();
-  const blogPosts = db.prepare("SELECT * FROM blog_posts ORDER BY created_at DESC").all();
-  const packagesList = db.prepare("SELECT * FROM packages").all();
-  const subscribers = db.prepare("SELECT * FROM newsletter_subscribers ORDER BY created_at DESC").all();
+  const galleryItems = await GalleryItem.find().sort({ created_at: -1 }).lean();
+  const blogPosts = await BlogPost.find().sort({ created_at: -1 }).lean();
+  const packagesList = await Package.find().lean();
+  const subscribers = await NewsletterSubscriber.find().sort({ created_at: -1 }).lean();
   
-  const dbSettings = db.prepare("SELECT * FROM site_settings").all() as { key: string, value: string }[];
+  const dbSettings = await SiteSetting.find().lean();
   const settingsMap: Record<string, string> = {};
-  dbSettings.forEach(s => { settingsMap[s.key] = s.value; });
+  dbSettings.forEach((s: any) => { settingsMap[s.key] = s.value; });
+
+  // Map _id to id for client components
+  const mapIds = (arr: any[]) => arr.map(item => {
+    const id = item._id.toString();
+    delete item._id;
+    delete item.__v;
+    return { ...item, id };
+  });
 
   return (
     <AdminDashboardClient
-      bookings={bookings}
+      bookings={mapIds(bookings)}
       stats={{
         totalBookings,
         pendingBookings,
@@ -78,10 +62,10 @@ export default function AdminPage() {
         blogCount,
         subscriberCount,
       }}
-      galleryItems={galleryItems as any[]}
-      blogPosts={blogPosts as any[]}
-      packages={packagesList as any[]}
-      subscribers={subscribers as any[]}
+      galleryItems={mapIds(galleryItems)}
+      blogPosts={mapIds(blogPosts)}
+      packages={mapIds(packagesList)}
+      subscribers={mapIds(subscribers)}
       settings={settingsMap}
     />
   );

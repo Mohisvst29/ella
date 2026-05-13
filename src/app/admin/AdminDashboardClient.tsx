@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 
-interface Booking { id: number; client_name: string; mobile: string; email: string|null; event_type: string; venue_location: string|null; package: string; additional_services: string|null; notes: string|null; status: string; created_at: string; }
+interface Booking { id: string; client_name: string; mobile: string; email: string|null; event_type: string; venue_location: string|null; package: string; additional_services: string|null; notes: string|null; status: string; created_at: string; }
 interface Stats { totalBookings: number; revenue: number; galleryCount: number; newToday: number; pendingBookings: number; confirmedBookings: number; blogCount: number; subscriberCount: number; }
 
 interface AdminProps {
@@ -23,7 +23,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
   const [activeTab, setActiveTab] = useState("Overview");
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState<Booking|null>(null);
-  const [busy, setBusy] = useState<number|null>(null);
+  const [busy, setBusy] = useState<string|null>(null);
   const [settingsState, setSettingsState] = useState(settings);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -62,7 +62,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
 
   const filtered = filter === "all" ? bookings : bookings.filter(b => b.status === filter);
 
-  const updateStatus = async (id: number, status: string) => {
+  const updateStatus = async (id: string, status: string) => {
     setBusy(id);
     await fetch(`/api/bookings/${id}`, { 
       method: "PATCH", 

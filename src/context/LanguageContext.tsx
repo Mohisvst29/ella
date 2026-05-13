@@ -6,7 +6,7 @@ type Language = 'en' | 'ar';
 interface LanguageContextType {
   lang: Language;
   setLang: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string) => any;
   isRtl: boolean;
 }
 
@@ -36,7 +36,7 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
     document.documentElement.lang = lang;
   }, [lang]);
 
-  const t = (key: string): string => {
+  const t = (key: string): any => {
     const keys = key.split('.');
     let result: any = translations[lang];
     for (const k of keys) {

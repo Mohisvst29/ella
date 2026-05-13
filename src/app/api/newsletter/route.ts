@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import getDb from "@/lib/db";
+import connectToDatabase, { NewsletterSubscriber } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,9 +10,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.redirect(new URL("/blog?subscribed=error", request.url));
     }
 
-    const db = getDb();
+    await connectToDatabase();
     try {
-      db.prepare("INSERT INTO newsletter_subscribers (email) VALUES (?)").run(email);
+      await NewsletterSubscriber.create({ email });
     } catch {
       // Email might already exist - that's fine
     }

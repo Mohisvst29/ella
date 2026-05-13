@@ -4,7 +4,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState } from "react";
 
 interface BlogPost {
-  id: number;
+  id: string;
   title: string;
   title_ar: string | null;
   slug: string;

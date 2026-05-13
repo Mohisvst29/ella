@@ -3,7 +3,19 @@ import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState } from "react";
 
-interface Package { id:number; name:string; tier:string; price:number; description:string; features:string; featured:number; active:number; }
+interface Package { 
+  id: string; 
+  name: string; 
+  name_ar?: string;
+  tier: string; 
+  price: number; 
+  description: string; 
+  description_ar?: string;
+  features: string; 
+  features_ar?: string;
+  featured: number; 
+  active: number; 
+}
 
 export default function PackagesPage() {
   const { t, isRtl } = useLanguage();

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 
 interface BlogPost {
-  id: number;
+  id: string;
   title: string;
   title_ar: string | null;
   slug: string;
