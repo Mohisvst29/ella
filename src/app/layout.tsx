@@ -30,10 +30,16 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  await connectToDatabase();
-  const dbSettings = await SiteSetting.find().lean();
-  const settings: Record<string, string> = {};
-  dbSettings.forEach((s: any) => { settings[s.key] = s.value; });
+  let settings: Record<string, string> = {};
+  
+  try {
+    await connectToDatabase();
+    const dbSettings = await SiteSetting.find().lean();
+    dbSettings.forEach((s: any) => { settings[s.key] = s.value; });
+  } catch (e) {
+    console.error("Database connection failed during build/render:", e);
+    // Use defaults
+  }
 
   const fontEn = settings.font_en || "Playfair Display";
   const fontAr = settings.font_ar || "Tajawal";
