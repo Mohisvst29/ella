@@ -47,14 +47,14 @@ export default function HeroSection() {
                 position: "absolute", inset: 0, 
                 width: "100%", height: "100%", 
                 objectFit: "cover", objectPosition: "center top", 
-                opacity: currentImg === idx ? 0.6 : 0,
+                opacity: currentImg === idx ? 0.8 : 0,
                 transition: "opacity 1.5s ease-in-out" 
               }}
             />
           ))
         )}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, #1a1114 30%, rgba(26,17,20,0.4) 70%, rgba(26,17,20,0.1) 100%)" }} />
-        <div style={{ position: "absolute", inset: 0, background: isRtl ? "linear-gradient(to left, rgba(26,17,20,0.6) 40%, transparent 100%)" : "linear-gradient(to right, rgba(26,17,20,0.6) 40%, transparent 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, #1a1114 10%, rgba(26,17,20,0.2) 60%, transparent 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: isRtl ? "linear-gradient(to left, rgba(26,17,20,0.4) 30%, transparent 100%)" : "linear-gradient(to right, rgba(26,17,20,0.4) 30%, transparent 100%)" }} />
       </div>
 
       {/* Orbs */}
@@ -82,12 +82,14 @@ export default function HeroSection() {
             fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.025em",
             color: "var(--text)", marginBottom: 24,
           }}>
-            {t("hero.titlePart1")}{" "}
-            <span className="grad-text" style={{ fontStyle: "italic" }}>{t("hero.titlePart2")}</span>
+            {isRtl ? (settings?.hero_title_ar || t("hero.titlePart1")) : (settings?.hero_title_en || t("hero.titlePart1"))}{" "}
+            <span className="grad-text" style={{ fontStyle: "italic" }}>
+              {isRtl ? (settings?.hero_span_ar || t("hero.titlePart2")) : (settings?.hero_span_en || t("hero.titlePart2"))}
+            </span>
           </h1>
 
           <p className="anim-fade-up delay-2" style={{ fontSize: 17, color: "var(--text-muted)", lineHeight: 1.75, marginBottom: 40, maxWidth: 480 }}>
-            {t("hero.desc")}
+            {isRtl ? (settings?.hero_desc_ar || t("hero.desc")) : (settings?.hero_desc_en || t("hero.desc"))}
           </p>
 
           {/* CTAs */}

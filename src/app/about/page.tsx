@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useSettings } from "@/context/SettingsContext";
@@ -6,8 +7,14 @@ import { useSettings } from "@/context/SettingsContext";
 export default function AboutPage() {
   const { t, isRtl } = useLanguage();
   const settings = useSettings();
+  const [teamList, setTeamList] = useState<any[]>([]);
+  const [activeImg, setActiveImg] = useState<string | null>(null);
 
-  const teamList = t("about.team") as any[];
+  useEffect(() => {
+    fetch("/api/team").then(res => res.json()).then(data => {
+      if (Array.isArray(data)) setTeamList(data);
+    });
+  }, []);
 
   return (
     <div className="page">
@@ -100,16 +107,18 @@ export default function AboutPage() {
                 settings?.about_team_4_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuD6DnM0EtsiNOMQCEpQ2J3hMpqB-q4NrCsNdS2rdS0l0NOEqT267qdr1H2291qmzyNq2bJfLXP6mRCRFUNNSuS3GsDEGKZO-KuIVjuk_lUi619KDDjYNkS763u60T5uSFO59r_-7SVjHIF-cJ3iiIYCG5IyHt9HxiJ_M5OoakhuGqTLgQ0caU7ni5t4EMsBz4IU2O2im-BfgRkCfSQReA5GbFkO4vYGpZ6v-BD3RRUJ6Y87zWR0QjcNCpDDnklv_UzkQKj8tY6ePwe_"
               ];
               return (
-                <div key={i} className="team-item" style={{ display: "flex", flexDirection: "column", gap: 16, textAlign: isRtl ? "right" : "left" }}>
-                  <div style={{ aspectRatio: "3/4", borderRadius: "var(--radius)", overflow: "hidden", position: "relative" }}>
-                    <img src={images[i]} alt={m.name} className="team-img" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s" }} />
+                <div key={m.id || i} className="team-item" style={{ display: "flex", flexDirection: "column", gap: 16, textAlign: isRtl ? "right" : "left" }}>
+                  <div 
+                    onClick={() => setActiveImg(m.image_url || images[i % 4])}
+                    style={{ aspectRatio: "3/4", borderRadius: "var(--radius)", overflow: "hidden", position: "relative", cursor: "pointer" }}>
+                    <img src={m.image_url || images[i % 4]} alt={isRtl ? m.name_ar : m.name} className="team-img" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s, filter 0.5s", filter: "grayscale(100%)" }} />
                     <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", padding: 20, background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)" }}>
-                      <span style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--pink)" }}>{m.title}</span>
+                      <span style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--pink)" }}>{isRtl ? (m.role_ar || m.role) : m.role}</span>
                     </div>
                   </div>
                   <div>
-                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 600 }}>{m.name}</h4>
-                    <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-dim)", marginTop: 4 }}>{m.role}</p>
+                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 600 }}>{isRtl ? (m.name_ar || m.name) : m.name}</h4>
+                    <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-dim)", marginTop: 4 }}>{isRtl ? (m.role_ar || m.role) : m.role}</p>
                   </div>
                 </div>
               );
@@ -133,7 +142,25 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-      <style>{`.team-item:hover .team-img { transform: scale(1.08); }`}</style>
+      <style>{`
+        .team-item:hover .team-img { transform: scale(1.08); filter: grayscale(0%) !important; }
+      `}</style>
+
+      {activeImg && (
+        <div 
+          onClick={() => setActiveImg(null)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 40, cursor: "zoom-out" }}>
+          <img 
+            src={activeImg} 
+            alt="Full view" 
+            style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: 8, boxShadow: "0 20px 50px rgba(0,0,0,0.5)", animation: "zoomIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }} 
+          />
+          <button style={{ position: "absolute", top: 30, [isRtl ? 'left' : 'right']: 30, background: "none", border: "none", color: "#fff", cursor: "pointer" }}>
+            <span className="icon" style={{ fontSize: 32 }}>close</span>
+          </button>
+          <style>{`@keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }`}</style>
+        </div>
+      )}
     </div>
   );
 }

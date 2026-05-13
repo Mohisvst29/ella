@@ -10,17 +10,18 @@ interface Stats { totalBookings: number; revenue: number; galleryCount: number; 
 interface AdminProps {
   bookings: Booking[];
   stats: Stats;
-  galleryItems?: any[];
-  blogPosts?: any[];
-  packages?: any[];
-  subscribers?: any[];
-  settings?: Record<string, string>;
+  galleryItems: any[];
+  blogPosts: any[];
+  packages: any[];
+  subscribers: any[];
+  settings: Record<string, string>;
+  teamMembers: any[];
 }
 
 const englishFonts = ["Playfair Display", "Inter", "Roboto", "Montserrat", "Cinzel", "Cormorant Garamond", "Libre Baskerville", "Bodoni Moda", "Prata"];
 const arabicFonts = ["Tajawal", "Cairo", "Almarai", "Amiri", "Reem Kufi", "El Messiri", "Changa", "Harmattan", "Lalezar"];
 
-export default function AdminDashboardClient({ bookings, stats, galleryItems = [], blogPosts = [], packages = [], subscribers = [], settings = {} }: AdminProps) {
+export default function AdminDashboardClient({ bookings, stats, galleryItems = [], blogPosts = [], packages = [], subscribers = [], settings = {}, teamMembers = [] }: AdminProps) {
   const { t, isRtl } = useLanguage();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("Overview");
@@ -33,6 +34,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
   const [editingPost, setEditingPost] = useState<any>(null);
   const [editingPackage, setEditingPackage] = useState<any>(null);
   const [addingGalleryImage, setAddingGalleryImage] = useState<any>(null);
+  const [editingTeamMember, setEditingTeamMember] = useState<any>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   const notify = (message: string, type: 'success' | 'error' = 'success') => {
@@ -124,6 +126,27 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     router.refresh();
   };
 
+  const saveTeamMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    const method = editingTeamMember.id ? "PATCH" : "POST";
+    const url = editingTeamMember.id ? `/api/team/${editingTeamMember.id}` : "/api/team";
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingTeamMember),
+      });
+      if (res.ok) {
+        setEditingTeamMember(null);
+        notify(isRtl ? "تم حفظ العضو بنجاح" : "Member saved successfully");
+        router.refresh();
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const navItems = [
     { id: "Overview", icon: "grid_view", label: t("admin.dashboard") },
     { id: "Gallery", icon: "photo_library", label: t("admin.gallery") },
@@ -131,7 +154,8 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     { id: "Blog", icon: "article", label: t("admin.blog") },
     { id: "Inquiries", icon: "mail", label: t("admin.inquiries") },
     { id: "Subscribers", icon: "group", label: t("admin.subscribers") },
-    { id: "Settings", icon: "settings", label: "الإعدادات" },
+    { id: "Team", icon: "badge", label: isRtl ? "فريق العمل" : "Team" },
+    { id: "Settings", icon: "settings", label: isRtl ? "الإعدادات" : "Settings" },
   ];
 
   const statCards = [
@@ -619,7 +643,44 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
 
 
 
-              {/* Page Content Images */}
+              {/* Hero Content Section */}
+              <div>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "نصوص الهيدر (Hero Content)" : "Hero Content"}</h3>
+                <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+                  <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div>
+                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الأساسي (EN)" : "Primary Title (EN)"}</label>
+                      <input type="text" value={settingsState.hero_title_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_title_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                    </div>
+                    <div>
+                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الأساسي (AR)" : "Primary Title (AR)"}</label>
+                      <input type="text" value={settingsState.hero_title_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_title_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                    </div>
+                  </div>
+                  <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div>
+                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الكلمة الملونة (EN)" : "Gradient Text (EN)"}</label>
+                      <input type="text" value={settingsState.hero_span_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_span_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                    </div>
+                    <div>
+                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الكلمة الملونة (AR)" : "Gradient Text (AR)"}</label>
+                      <input type="text" value={settingsState.hero_span_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_span_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                    </div>
+                  </div>
+                  <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div>
+                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
+                      <textarea rows={3} value={settingsState.hero_desc_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                    </div>
+                    <div>
+                      <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (AR)" : "Description (AR)"}</label>
+                      <textarea rows={3} value={settingsState.hero_desc_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section Images */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "صور أقسام الموقع" : "Section Images"}</h3>
                 <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
@@ -1156,6 +1217,76 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
         .anim-scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
       `}</style>
+      <style>{`.anim-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; } @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+
+      {/* Team Modal */}
+      {editingTeamMember && (
+        <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
+          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 600, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingTeamMember.id ? (isRtl ? "تعديل عضو" : "Edit Member") : (isRtl ? "إضافة عضو" : "Add Member")}</h3>
+              <button onClick={() => setEditingTeamMember(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
+                <span className="icon">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={saveTeamMember} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الاسم (EN)" : "Name (EN)"}</label>
+                  <input required type="text" value={editingTeamMember.name || ""} onChange={e => setEditingTeamMember({ ...editingTeamMember, name: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الاسم (AR)" : "Name (AR)"}</label>
+                  <input required type="text" value={editingTeamMember.name_ar || ""} onChange={setEditingTeamMember && (e => setEditingTeamMember({ ...editingTeamMember, name_ar: e.target.value }))} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "المسمى الوظيفي (EN)" : "Role (EN)"}</label>
+                  <input type="text" value={editingTeamMember.role || ""} onChange={e => setEditingTeamMember({ ...editingTeamMember, role: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "المسمى الوظيفي (AR)" : "Role (AR)"}</label>
+                  <input type="text" value={editingTeamMember.role_ar || ""} onChange={e => setEditingTeamMember({ ...editingTeamMember, role_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "الصورة الشخصية" : "Profile Image"}</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input type="text" value={editingTeamMember.image_url || ""} onChange={e => setEditingTeamMember({ ...editingTeamMember, image_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                  <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                    <span className="icon">upload</span>
+                    <input type="file" accept="image/*" style={{ display: "none" }} onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setIsUploading(true);
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      try {
+                        const res = await fetch("/api/upload", { method: "POST", body: formData });
+                        const data = await res.json();
+                        if (data.url) setEditingTeamMember({ ...editingTeamMember, image_url: data.url });
+                      } finally {
+                        setIsUploading(false);
+                      }
+                    }} />
+                  </label>
+                </div>
+              </div>
+
+              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                <button type="button" onClick={() => setEditingTeamMember(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
+                <button type="submit" disabled={isSaving || isUploading} className="btn btn-primary">
+                  {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Member")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

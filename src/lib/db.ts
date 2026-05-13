@@ -44,9 +44,25 @@ async function connectToDatabase() {
           { key: 'logo_url', value: '' },
           { key: 'logo_width', value: '150' },
           { key: 'hero_video_url', value: '' },
+          { key: 'hero_title_en', value: 'The Art of Your' },
+          { key: 'hero_title_ar', value: 'فن إطلالتك' },
+          { key: 'hero_span_en', value: 'Majestic Presence' },
+          { key: 'hero_span_ar', value: 'المهيبة' },
+          { key: 'hero_desc_en', value: 'Exclusive female-only wedding photography for the modern Saudi bride. Capturing every whispered secret and luminous moment with cinematic precision.' },
+          { key: 'hero_desc_ar', value: 'تصوير حفلات زفاف حصري للسيدات فقط للعروس السعودية العصرية. نوثق كل سر يهمس به وكل لحظة مضيئة بدقة سينمائية.' },
           { key: 'font_en', value: 'Playfair Display' },
           { key: 'font_ar', value: 'Tajawal' },
           { key: 'social_links', value: JSON.stringify({ instagram: '', twitter: '', facebook: '', linkedin: '', behance: '' }) }
+        ]);
+      }
+
+      // Seed Team if empty
+      const teamCount = await TeamMember.countDocuments();
+      if (teamCount === 0) {
+        await TeamMember.create([
+          { name: 'Layan Ahmed', name_ar: 'ليان أحمد', role: 'Creative Director & Lead Photographer', role_ar: 'المديرة الإبداعية والمصورة الرئيسية', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuARSYl-dyL6YPrsdEHG4IP8gQ6MOvp2JrcPs1d_euFGEnKJwuXLlwmKNGgTjlKi2-pP98Bty3-CTif5rqSnY4pLeQeKNyv4s2dju1FDw7LAZhdHqOULMCeEyZC-5omg30ERdACP9yBnt0WBGZnioXWx3C_i7ui9wOVdthM1B-JSWbQ0_OHolskTBkWwoZBjOpzyrg-32o2oEll2uTGfAUWnYQ3PJl-mFAtHOxzxbqk3jK59qcwDmVp5Tas7Org4KoLT4R10vdmDBwss', order: 1 },
+          { name: 'Sarah Khalid', name_ar: 'سارة خالد', role: 'Senior Videographer', role_ar: 'مصورة فيديو أولى', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAHKKUMMEwSYQTJSHHVi6vR9HNDaE04n6YVLU8TwJwEOX3aHW6KH8QtQz_mkOJDu44VL-qTFWzwZimVnouZd3Jso99q0w4lTA8YVRAWHWuJud9IAE586lA7lpSrK9LazrZgV6PYMbORHv3dEoYOb1T0lH2gIlNfnLFAvzAXGIRoq77R2vILBezKjoU3Da1KfS-5v34a43cIxV0U04jogmUV90XJmD07KHvCNG5VIhTM4j7mf2XGHb_yyiWHkY1O2X7AbS_XBhVR3beR', order: 2 },
+          { name: 'Noura Mansour', name_ar: 'نورة منصور', role: 'Lighting Specialist', role_ar: 'أخصائية إضاءة', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC3KfROc4OkeZUesjuJMPEn8jPfi8_xg_xMitgyw8M5sJTwFVDz3YEiaHP5BifEHV7ESwyoQnuM1IPSykXdvPnZhCTvjo-MJvdFduoCjnY6LH9aNLfbo15Y150NMGI81YTBFR9LJ5Tr4kxeuoGRNQEvgbI-mv0uu6D99OMch_CVF_kA6m1Kv_niun-8dt3VDkm9ALSpJ48Ro466U7fzHmS9QTgUh9u0PJwdU2UBtrVTLWC6qJlDUewFosovZ_XyJ_jx5Noj5AK9Uxng', order: 3 }
         ]);
       }
 
@@ -253,6 +269,15 @@ const SiteSettingSchema = new mongoose.Schema({
   value: String,
 });
 
+const TeamMemberSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  name_ar: String,
+  role: String,
+  role_ar: String,
+  image_url: String,
+  order: { type: Number, default: 0 },
+}, { timestamps: true });
+
 // Convert _id to id in JSON outputs
 const transformId = (doc: any, ret: any) => {
   ret.id = ret._id.toString();
@@ -267,6 +292,7 @@ BlogPostSchema.set('toJSON', { transform: transformId });
 NewsletterSubscriberSchema.set('toJSON', { transform: transformId });
 PackageSchema.set('toJSON', { transform: transformId });
 SiteSettingSchema.set('toJSON', { transform: transformId });
+TeamMemberSchema.set('toJSON', { transform: transformId });
 
 // ================= MODELS =================
 
@@ -276,5 +302,6 @@ export const BlogPost = mongoose.models.BlogPost || mongoose.model('BlogPost', B
 export const NewsletterSubscriber = mongoose.models.NewsletterSubscriber || mongoose.model('NewsletterSubscriber', NewsletterSubscriberSchema);
 export const Package = mongoose.models.Package || mongoose.model('Package', PackageSchema);
 export const SiteSetting = mongoose.models.SiteSetting || mongoose.model('SiteSetting', SiteSettingSchema);
+export const TeamMember = mongoose.models.TeamMember || mongoose.model('TeamMember', TeamMemberSchema);
 
 export default connectToDatabase;
