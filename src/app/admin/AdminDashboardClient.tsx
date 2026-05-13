@@ -80,7 +80,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     { id: "Blog", icon: "article", label: t("admin.blog") },
     { id: "Inquiries", icon: "mail", label: t("admin.inquiries") },
     { id: "Subscribers", icon: "group", label: t("admin.subscribers") },
-    { id: "Settings", icon: "settings", label: isRtl ? "الإعدادات" : "Settings" },
+    { id: "Settings", icon: "settings", label: "الإعدادات" },
   ];
 
   const statCards = [
@@ -226,7 +226,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           <div>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{t("admin.gallery")}</h2>
-              <button onClick={() => setAddingGalleryImage({ image_url: "", title: "", category: "Wedding" })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>{isRtl ? "+ إضافة صورة" : "+ Add Image"}</button>
+              <button onClick={() => setAddingGalleryImage({ image_url: "", title: "", category: "Wedding" })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ إضافة صورة</button>
             </div>
             <div style={s({ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 })}>
               {galleryItems.map((item: any) => (
@@ -257,16 +257,16 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           <div>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{t("admin.blog")}</h2>
-              <button onClick={() => setEditingPost({ title: "", title_ar: "", content: "", content_ar: "", category: "General", image_url: "", published: 0 })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>{isRtl ? "+ مقال جديد" : "+ New Post"}</button>
+              <button onClick={() => setEditingPost({ title: "", title_ar: "", content: "", content_ar: "", category: "General", image_url: "", published: 0 })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ مقال جديد</button>
             </div>
             <div style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden" })}>
               <table style={s({ width: "100%", borderCollapse: "collapse", textAlign: isRtl ? "right" : "left" })}>
                 <thead>
                   <tr style={s({ background: "rgba(255,255,255,0.02)" })}>
-                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "العنوان" : "Title"}</th>
-                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "التصنيف" : "Category"}</th>
-                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "الحالة" : "Status"}</th>
-                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "إجراءات" : "Actions"}</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>العنوان</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>التصنيف</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>الحالة</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>إجراءات</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -303,7 +303,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           <div>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{t("admin.pricing")}</h2>
-              <button className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>{isRtl ? "+ باقة جديدة" : "+ New Package"}</button>
+              <button className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ باقة جديدة</button>
             </div>
             <div style={s({ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 })}>
               {packages.map((pkg: any) => (
@@ -355,7 +355,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                           <span style={s({ padding: "4px 12px", borderRadius: 20, fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", background: st.bg, color: st.color })}>{st.label}</span>
                         </td>
                         <td style={s({ padding: "16px 20px" })}>
-                          <button onClick={() => setSelected(b)} style={s({ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", color: "var(--text)", cursor: "pointer", fontSize: 12 })}>{isRtl ? "التفاصيل" : "Details"}</button>
+                          <button onClick={() => setSelected(b)} style={s({ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", color: "var(--text)", cursor: "pointer", fontSize: 12 })}>التفاصيل</button>
                         </td>
                       </tr>
                     );
@@ -396,7 +396,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
         {activeTab === "Settings" && (
           <div>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
-              <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? "إعدادات الموقع" : "Site Settings"}</h2>
+              <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>إعدادات الموقع</h2>
               <button 
                 className="btn btn-primary" 
                 style={s({ padding: "8px 24px", fontSize: 13 })}
@@ -408,7 +408,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                   router.refresh();
                 }}
               >
-                {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ التغييرات" : "Save Changes")}
+                {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
               </button>
             </div>
             
@@ -416,7 +416,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
               
               {/* Branding Section */}
               <div>
-                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "الهوية البصرية" : "Branding"}</h3>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>الهوية البصرية</h3>
                 <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رابط الشعار (URL)" : "Logo URL"}</label>
@@ -448,7 +448,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
 
               {/* Typography Section */}
               <div>
-                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "الخطوط (Google Fonts)" : "Typography"}</h3>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>الخطوط (Google Fonts)</h3>
                 <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "الخط الإنجليزي الأساسي" : "Primary English Font"}</label>
@@ -473,7 +473,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
 
               {/* Media Section */}
               <div>
-                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "الوسائط والصور" : "Media & Images"}</h3>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>الوسائط والصور</h3>
                 <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رابط فيديو الهيدر في الرئيسية (Hero Video)" : "Home Hero Video URL"}</label>
@@ -555,7 +555,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
 
               {/* Social Media Section */}
               <div>
-                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "روابط السوشيال ميديا" : "Social Media Links"}</h3>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>روابط السوشيال ميديا</h3>
                 <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>Instagram</label>
@@ -682,7 +682,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           <div style={s({ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" })} onClick={() => setEditingPackage(null)} />
           <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: 600, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 32, maxHeight: "90vh", overflowY: "auto" })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
-              <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? "تعديل الباقة" : "Edit Package"}</h3>
+              <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>تعديل الباقة</h3>
               <button onClick={() => setEditingPackage(null)} style={s({ color: "var(--text-muted)", cursor: "pointer", background: "none", border: "none" })}>
                 <span className="icon">close</span>
               </button>
@@ -701,17 +701,17 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
               </div>
 
               <div>
-                <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "السعر (ريال)" : "Price (SAR)"}</label>
+                <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>السعر (ريال)</label>
                 <input type="number" value={editingPackage.price} onChange={e => setEditingPackage({...editingPackage, price: Number(e.target.value)})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
               </div>
 
               <div style={s({ display: "flex", gap: 16, flexDirection: isRtl ? "row-reverse" : "row" })}>
                 <div style={s({ flex: 1 })}>
-                  <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "الوصف (إنجليزي)" : "Description (EN)"}</label>
+                  <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>الوصف (إنجليزي)</label>
                   <textarea rows={3} value={editingPackage.description || ""} onChange={e => setEditingPackage({...editingPackage, description: e.target.value})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
                 </div>
                 <div style={s({ flex: 1 })}>
-                  <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "الوصف (عربي)" : "Description (AR)"}</label>
+                  <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>الوصف (عربي)</label>
                   <textarea rows={3} value={editingPackage.description_ar || ""} onChange={e => setEditingPackage({...editingPackage, description_ar: e.target.value})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
                 </div>
               </div>
@@ -783,7 +783,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                   className="btn btn-primary" 
                   style={s({ padding: "8px 24px", fontSize: 13 })}
                 >
-                  {isSaving ? "..." : (isRtl ? "حفظ التغييرات" : "Save Changes")}
+                  {isSaving ? "..." : "حفظ التغييرات"}
                 </button>
               </div>
             </div>
@@ -797,7 +797,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           <div style={s({ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" })} onClick={() => setAddingGalleryImage(null)} />
           <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: 500, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 32, maxHeight: "90vh", overflowY: "auto" })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
-              <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? "إضافة صورة للمعرض" : "Add Gallery Image"}</h3>
+              <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>إضافة صورة للمعرض</h3>
               <button onClick={() => setAddingGalleryImage(null)} style={s({ color: "var(--text-muted)", cursor: "pointer", background: "none", border: "none" })}>
                 <span className="icon">close</span>
               </button>
@@ -854,7 +854,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                   style={s({ padding: "8px 24px", fontSize: 13, opacity: (!addingGalleryImage.image_url || isSaving) ? 0.5 : 1 })}
                   disabled={!addingGalleryImage.image_url || isSaving}
                 >
-                  {isSaving || isUploading ? "..." : (isRtl ? "إضافة" : "Add")}
+                  {isSaving || isUploading ? "..." : "إضافة"}
                 </button>
               </div>
             </div>
@@ -868,7 +868,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           <div style={s({ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" })} onClick={() => setEditingPost(null)} />
           <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: 800, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 32, maxHeight: "90vh", overflowY: "auto" })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
-              <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? (editingPost.id ? "تعديل المقال" : "مقال جديد") : (editingPost.id ? "Edit Post" : "New Post")}</h3>
+              <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{editingPost.id ? "تعديل المقال" : "مقال جديد"}</h3>
               <button onClick={() => setEditingPost(null)} style={s({ color: "var(--text-muted)", cursor: "pointer", background: "none", border: "none" })}>
                 <span className="icon">close</span>
               </button>
@@ -954,7 +954,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                   style={s({ padding: "8px 24px", fontSize: 13, opacity: isSaving ? 0.5 : 1 })}
                   disabled={isSaving}
                 >
-                  {isSaving || isUploading ? "..." : (isRtl ? "حفظ" : "Save")}
+                  {isSaving || isUploading ? "..." : "حفظ"}
                 </button>
               </div>
             </div>
