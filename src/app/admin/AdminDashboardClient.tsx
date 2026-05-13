@@ -822,6 +822,21 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                     <span style={s({ fontSize: 11, color: "var(--text-muted)" })}>{isRtl ? "يمكنك إضافة صورة أو أكثر لتعمل كشريط عرض (Slider)." : "Add one or multiple images to create a slider."}</span>
                   </div>
 
+                  {/* Hero Video */}
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "فيديو الخلفية (Hero Video)" : "Hero Background Video"}</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input type="text" value={settingsState.hero_video_url || ""} onChange={e => setSettingsState({ ...settingsState, hero_video_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                        <span className="icon">upload</span>
+                        <input type="file" accept="video/*" style={{ display: "none" }} onChange={e => handleUpload(e, "hero_video_url")} />
+                      </label>
+                    </div>
+                    <span style={s({ fontSize: 11, color: "#ffb0cc", fontWeight: 600 })}>
+                      {isRtl ? "ملاحظة: إذا كان حجم الفيديو أكبر من 4.5 ميجابايت، يرجى وضع الرابط مباشرة بدلاً من الرفع." : "Note: If video is > 4.5MB, please paste a direct link instead of uploading."}
+                    </span>
+                  </div>
+
 
 
               {/* Hero Content Section */}

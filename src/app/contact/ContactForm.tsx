@@ -32,19 +32,36 @@ export default function ContactForm() {
     e.preventDefault();
     setLoading(true); setError("");
     const fd = new FormData(e.currentTarget);
+    const client_name = fd.get("client_name") as string;
+    const mobile = fd.get("mobile") as string;
+    const event_type = fd.get("event_type") as string;
+    const venue = fd.get("venue_location") as string;
+    const notes = fd.get("notes") as string;
+
     const body = { 
-      client_name: fd.get("client_name"), 
-      mobile: fd.get("mobile"), 
+      client_name, 
+      mobile, 
       email: fd.get("email"), 
-      event_type: fd.get("event_type"), 
-      venue_location: fd.get("venue_location"), 
+      event_type, 
+      venue_location: venue, 
       package: pkg, 
       additional_services: services.join(", "), 
-      notes: fd.get("notes") 
+      notes 
     };
+
     try {
       const r = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-      if (r.ok) setDone(true);
+      if (r.ok) {
+        // Construct WhatsApp Message
+        const wpNumber = "966500000000"; // Default or from settings if I had it in props
+        const msg = isRtl 
+          ? `حجز جديد من الموقع:\n\nالاسم: ${client_name}\nالجوال: ${mobile}\nالمناسبة: ${event_type}\nالموقع: ${venue}\nالباقة: ${pkg}\nالخدمات الإضافية: ${services.join(", ")}\nملاحظات: ${notes}`
+          : `New Booking Request:\n\nName: ${client_name}\nMobile: ${mobile}\nEvent: ${event_type}\nVenue: ${venue}\nPackage: ${pkg}\nAdd-ons: ${services.join(", ")}\nNotes: ${notes}`;
+        
+        const wpUrl = `https://wa.me/${wpNumber}?text=${encodeURIComponent(msg)}`;
+        window.open(wpUrl, "_blank");
+        setDone(true);
+      }
       else { const j = await r.json(); setError(isRtl ? "حدث خطأ أثناء الإرسال." : (j.error || "Error occurred.")); }
     } catch { setError(isRtl ? "خطأ في الاتصال." : "Network error."); }
     setLoading(false);

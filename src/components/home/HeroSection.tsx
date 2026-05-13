@@ -8,8 +8,9 @@ export default function HeroSection() {
   const { t, isRtl } = useLanguage();
   const settings = useSettings();
   const [currentImg, setCurrentImg] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
 
-  const images = (settings?.hero_bg_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuCFEJlqeNv3ONMFj2YgJ5kdiOCyvK4mjYpENdSKDDpd_lzn_NAquQxrBaLnwExI0FL7gFD9SQpa9Xu0XfvTFao0mBlKbmR06TiwWIaMHOXyIt-3X0vSi_jUnxHfIrjDNRhkgCH8VAl-PoyXkx8Wy-PqQTvkwtUypd0QqGwHf2muBX_Msl0wmZD_MrvGZrDCIT-wi4DZgMYfQKqGUSNXP4cdyH-xQ2BdFuuCFu4E1Rho6hDJ2_-ZEiNKKFE5GooOCOndosR_SDyblkXN")
+  const images = (settings?.hero_bg_url || "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop")
     .split(",")
     .filter(Boolean);
 
@@ -32,11 +33,25 @@ export default function HeroSection() {
       {/* BG Image or Video */}
       <div style={{ position: "absolute", inset: 0 }}>
         {settings?.hero_video_url ? (
-          <video 
-            src={settings.hero_video_url} 
-            autoPlay loop muted playsInline 
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", opacity: 0.6 }} 
-          />
+          <>
+            <video 
+              src={settings.hero_video_url} 
+              autoPlay loop muted={isMuted} playsInline 
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", opacity: 0.6 }} 
+            />
+            {/* Sound Toggle Button */}
+            <button 
+              onClick={() => setIsMuted(!isMuted)}
+              style={{
+                position: "absolute", bottom: 40, [isRtl ? 'left' : 'right']: 40,
+                width: 48, height: 48, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)",
+                background: "rgba(0,0,0,0.3)", backdropFilter: "blur(8px)", color: "#fff",
+                display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10
+              }}
+            >
+              <span className="icon" style={{ fontSize: 20 }}>{isMuted ? "volume_off" : "volume_up"}</span>
+            </button>
+          </>
         ) : (
           images.map((img, idx) => (
             <img

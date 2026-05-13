@@ -65,6 +65,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }
           [dir="ltr"] .font-display { font-family: var(--font-display-en); }
           [dir="rtl"] .font-display { font-family: var(--font-display-ar); }
+          [dir="ltr"] :root { --wa-left: auto; --wa-right: 32px; }
+          [dir="rtl"] :root { --wa-left: 32px; --wa-right: auto; }
         `}</style>
       </head>
       <body style={{ position: "relative", minHeight: "100vh" }}>
@@ -96,13 +98,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             }} />
 
             {/* WhatsApp FAB */}
-            {settings.social_whatsapp && (
-              <a href={`https://wa.me/${settings.social_whatsapp}`} target="_blank" rel="noopener noreferrer" className="whatsapp-fab"
-                style={{
-                position: "fixed", bottom: 32, right: 32, width: 56, height: 56,
-                borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+            <a 
+              href={`https://wa.me/${settings.social_whatsapp || "966500000000"}`} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="whatsapp-fab"
+              style={{
+                position: "fixed", 
+                bottom: 32, 
+                left: "var(--wa-left, auto)",
+                right: "var(--wa-right, 32px)",
+                width: 56, 
+                height: 56,
+                borderRadius: "50%", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center",
                 background: "linear-gradient(135deg, var(--pink), var(--purple), var(--cyan))",
-                color: "#fff", zIndex: 90,
+                color: "#fff", 
+                zIndex: 90,
                 boxShadow: "0 0 25px rgba(255,176,204,0.4)",
                 transition: "transform 0.2s, box-shadow 0.2s",
               }}
@@ -110,7 +124,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             >
               <span className="icon" style={{ fontSize: 24 }}>chat_bubble</span>
             </a>
-            )}
           </LanguageProvider>
         </SettingsProvider>
         <style>{`.whatsapp-fab:hover { transform: scale(1.1) !important; }`}</style>
