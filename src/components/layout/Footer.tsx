@@ -74,9 +74,9 @@ export default function Footer() {
               {t("footer.contactTitle")}
             </span>
             {[
-              { icon: "mail", text: "studio@aylamedia.sa" },
-              { icon: "call", text: "+966 500 000 000" },
-              { icon: "location_on", text: isRtl ? "العليا، الرياض، السعودية" : "Al Olaya, Riyadh, KSA" },
+              { icon: "mail", text: settings?.contact_email || "studio@aylamedia.sa" },
+              { icon: "call", text: settings?.contact_phone || "+966 500 000 000" },
+              { icon: "location_on", text: settings?.contact_address || (isRtl ? "العليا، الرياض، السعودية" : "Al Olaya, Riyadh, KSA") },
               { icon: "schedule", text: t("contact.hours") },
             ].map(({ icon, text }) => (
               <div key={text} style={{ display: "flex", alignItems: "center", gap: 10, flexDirection: isRtl ? "row-reverse" : "row" }}>

@@ -12,13 +12,28 @@ export default function HeroSection() {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Function to convert Google Drive link to direct link
+  // Function to convert Google Drive link to direct streamable link
   const getDirectLink = (url: string) => {
     if (!url) return "";
+    
+    // Google Drive handling
     if (url.includes("drive.google.com")) {
-      const id = url.split("/d/")[1]?.split("/")[0] || url.split("id=")[1]?.split("&")[0];
-      if (id) return `https://drive.google.com/uc?export=download&id=${id}`;
+      let id = "";
+      if (url.includes("/d/")) {
+        id = url.split("/d/")[1]?.split("/")[0] || "";
+      } else if (url.includes("id=")) {
+        id = url.split("id=")[1]?.split("&")[0] || "";
+      }
+      
+      if (id) {
+        // This format is more reliable for direct streaming in <video> tags
+        // However, note that large files (>100MB) might still be blocked by Google's virus scan warning
+        return `https://drive.google.com/uc?export=download&id=${id}`;
+      }
     }
+
+    // YouTube handling (Simple check - though <video> won't play it directly, 
+    // we could eventually add iframe support for YouTube if needed)
     return url;
   };
 
@@ -120,10 +135,10 @@ export default function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="container" style={{ position: "relative", zIndex: 2, padding: "0 var(--px)" }}>
+      <div className="container" style={{ position: "relative", zIndex: 2, padding: "80px var(--px) 0" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           {/* Tagline */}
-          <div className="anim-fade-up" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 24 }}>
+          <div className="anim-fade-up" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 20 }}>
             <span style={{ width: 40, height: 1, background: "var(--pink)" }} />
             <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--pink)" }}>{heroTagline}</span>
             <span style={{ width: 40, height: 1, background: "var(--pink)" }} />

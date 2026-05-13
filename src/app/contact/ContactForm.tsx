@@ -114,13 +114,44 @@ export default function ContactForm() {
               <span className="icon" style={{ fontSize: 36, color: "var(--pink)", marginBottom: 16, display: "block" }}>contact_support</span>
               <h3 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>{t("contact.getInTouch")}</h3>
               <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 20 }}>{t("contact.hours")}</p>
-              {[["mail","studio@aylamedia.sa"], ["call","+966 500 000 000"], ["location_on", isRtl ? "العليا، الرياض، السعودية" : "Al Olaya, Riyadh, KSA"]].map(([icon, text]) => (
-                <div key={text} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, flexDirection: isRtl ? "row-reverse" : "row" }}>
-                  <span className="icon" style={{ color: "var(--pink)", fontSize: 18 }}>{icon}</span>
-                  <span style={{ fontSize: 14, color: "var(--text)" }}>{text}</span>
+              {[
+                { icon: "mail", text: settings.contact_email || "studio@aylamedia.sa" },
+                { icon: "call", text: settings.contact_phone || "+966 500 000 000" },
+                { icon: "location_on", text: settings.contact_address || (isRtl ? "العليا، الرياض، السعودية" : "Al Olaya, Riyadh, KSA") }
+              ].map((item) => (
+                <div key={item.text} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, flexDirection: isRtl ? "row-reverse" : "row" }}>
+                  <span className="icon" style={{ color: "var(--pink)", fontSize: 18 }}>{item.icon}</span>
+                  <span style={{ fontSize: 14, color: "var(--text)" }}>{item.text}</span>
                 </div>
               ))}
             </div>
+            
+            {/* Map */}
+            {settings.contact_map_url && (
+              <div className="card reveal-up" style={{ height: 250, padding: 0, overflow: "hidden" }}>
+                {(() => {
+                  let mapUrl = settings.contact_map_url;
+                  // If it's a sharing link, it won't work in iframe. We try to detect standard embed URLs or fallback.
+                  // Note: Converting a sharing link to an embed link reliably usually requires API, 
+                  // but we can check if it's already an embed link or a share link.
+                  if (mapUrl.includes("google.com/maps") && !mapUrl.includes("embed")) {
+                    // Try to convert simple links if possible, otherwise user should use embed link
+                    // For now, we just pass it as is but with a check
+                  }
+                  return (
+                    <iframe 
+                      src={mapUrl} 
+                      width="100%" 
+                      height="100%" 
+                      style={{ border: 0, filter: "grayscale(1) invert(0.9)" }} 
+                      allowFullScreen 
+                      loading="lazy" 
+                    />
+                  );
+                })()}
+              </div>
+            )}
+
             <div className="card" style={{ padding: 28 }}>
               <h4 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--pink)", marginBottom: 20 }}>{t("contact.policies")}</h4>
               {[

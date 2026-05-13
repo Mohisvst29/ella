@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import connectToDatabase, { SiteSetting } from "@/lib/db";
 
 export async function POST(request: Request) {
@@ -20,6 +21,9 @@ export async function PATCH(request: Request) {
     });
 
     await Promise.all(promises);
+
+    // Revalidate the entire site to reflect setting changes
+    revalidatePath("/", "layout");
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -757,23 +757,6 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>الوسائط والصور</h3>
                 <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
-                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
-                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رابط فيديو الهيدر في الرئيسية (Hero Video)" : "Home Hero Video URL"}</label>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <input 
-                        type="text" 
-                        value={settingsState.hero_video_url || ""} 
-                        onChange={e => setSettingsState({ ...settingsState, hero_video_url: e.target.value })}
-                        style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14, fontFamily: "monospace" })} 
-                        placeholder="https://..."
-                      />
-                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
-                        <span className="icon">upload</span>
-                        <input type="file" accept="video/*" style={{ display: "none" }} onChange={e => handleUpload(e, "hero_video_url")} />
-                      </label>
-                    </div>
-                    <span style={s({ fontSize: 11, color: "var(--text-muted)" })}>{isRtl ? "اختياري. يظهر كخلفية للهيدر." : "Optional. Plays as hero background."}</span>
-                  </div>
 
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صور الهيدر (Hero Images)" : "Hero Images"}</label>
@@ -1179,8 +1162,9 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                     <input type="text" value={settingsState.contact_address || ""} onChange={e => setSettingsState({ ...settingsState, contact_address: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder={isRtl ? "الرياض، السعودية" : "Riyadh, KSA"} />
                   </div>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
-                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رابط جوجل ماب" : "Google Maps Link"}</label>
-                    <input type="text" value={settingsState.contact_maps_url || ""} onChange={e => setSettingsState({ ...settingsState, contact_maps_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://goo.gl/maps/..." />
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رابط جوجل ماب (Embed URL)" : "Google Maps Link (Embed URL)"}</label>
+                    <input type="text" value={settingsState.contact_map_url || ""} onChange={e => setSettingsState({ ...settingsState, contact_map_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://www.google.com/maps/embed?..." />
+                    <span style={s({ fontSize: 11, color: "var(--text-muted)" })}>{isRtl ? "هام: استخدم رابط 'تضمين خريطة' (Embed) وليس رابط المشاركة العادي." : "Important: Use 'Embed a map' URL from Google Maps share menu."}</span>
                   </div>
                 </div>
               </div>
