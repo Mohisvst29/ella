@@ -357,6 +357,45 @@ export default function AdminDashboardClient({
 
   const s = (obj: React.CSSProperties): React.CSSProperties => obj;
 
+  if (!isAuthorized) {
+    const handleLogin = (e: React.FormEvent) => {
+      e.preventDefault();
+      const validUser = settingsState.admin_username || "admin";
+      const validPass = settingsState.admin_password || "Ee203120@#";
+      if (loginForm.user === validUser && loginForm.pass === validPass) {
+        setIsAuthorized(true);
+      } else {
+        notify(isRtl ? "بيانات الدخول غير صحيحة" : "Invalid credentials", "error");
+      }
+    };
+    return (
+      <div style={s({ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: 20 })}>
+        <div className="anim-scale-in" style={s({ background: "var(--surface)", border: "1px solid var(--border)", padding: 40, borderRadius: "var(--radius)", width: "100%", maxWidth: 400, textAlign: isRtl ? "right" : "left", boxShadow: "0 20px 40px rgba(0,0,0,0.3)" })}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <h1 style={s({ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 700, color: "var(--pink)", marginBottom: 8 })}>Ella Media</h1>
+            <p style={s({ fontSize: 13, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.1em" })}>{t("admin.portal")}</p>
+          </div>
+          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" }}>{isRtl ? "اسم المستخدم" : "Username"}</label>
+              <input type="text" required value={loginForm.user} onChange={e => setLoginForm({...loginForm, user: e.target.value})} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="admin" />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" }}>{isRtl ? "كلمة المرور" : "Password"}</label>
+              <input type="password" required value={loginForm.pass} onChange={e => setLoginForm({...loginForm, pass: e.target.value})} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="••••••••" />
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: 14, marginTop: 8 }}>{isRtl ? "تسجيل الدخول" : "Login"}</button>
+          </form>
+          {notification && (
+            <div className="anim-fade-up" style={{ marginTop: 20, padding: 12, borderRadius: 8, background: notification.type === 'error' ? "rgba(255,0,0,0.1)" : "rgba(0,255,0,0.1)", color: notification.type === 'error' ? "#ff4d4d" : "#4ade80", fontSize: 12, textAlign: "center", border: `1px solid ${notification.type === 'error' ? "rgba(255,0,0,0.2)" : "rgba(0,255,0,0.2)"}` }}>
+              {notification.message}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={s({ display: "flex", minHeight: "100vh", background: "var(--bg)", color: "var(--text)", flexDirection: isRtl ? "row-reverse" : "row" })}>
       {isMobile && (
