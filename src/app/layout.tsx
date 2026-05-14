@@ -50,7 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const fontUrl = `https://fonts.googleapis.com/css2?family=${fontEn.replace(/ /g, '+')}:ital,wght@0,400;0,600;0,700;1,400&family=${fontAr.replace(/ /g, '+')}:wght@400;500;700;800&display=swap`;
 
   return (
-    <html lang="en" className={`${playfair.variable} ${manrope.variable}`}>
+    <html lang="ar" dir="rtl" className={`${playfair.variable} ${manrope.variable}`}>
       <head>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
         <link rel="stylesheet" href={fontUrl} />
