@@ -9,7 +9,7 @@ export default function ContactForm() {
   const { t, isRtl } = useLanguage();
   const settings = useSettings();
   const searchParams = useSearchParams();
-  const [pkg, setPkg] = useState(searchParams.get("package") || "essential");
+  const [pkg, setPkg] = useState("essential");
   const [services, setServices] = useState<string[]>([]);
   const [addons, setAddons] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -17,10 +17,13 @@ export default function ContactForm() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const p = searchParams.get("package");
+    if (p) setPkg(p);
+
     fetch("/api/addons").then(r => r.json()).then(data => {
       if (Array.isArray(data)) setAddons(data);
     }).catch(() => {});
-  }, []);
+  }, [searchParams]);
 
   const pkgs = [
     { id: "essential", label: isRtl ? "أساسي" : "Essential", desc: isRtl ? "تغطية أساسية" : "Basic Coverage" },
@@ -117,7 +120,7 @@ export default function ContactForm() {
               {[
                 { icon: "mail", text: settings.contact_email || "studio@aylamedia.sa" },
                 { icon: "call", text: settings.contact_phone || "+966 500 000 000" },
-                { icon: "location_on", text: settings.contact_address || (isRtl ? "العليا، الرياض، السعودية" : "Al Olaya, Riyadh, KSA") }
+                { icon: "location_on", text: (isRtl ? settings.contact_address_ar : settings.contact_address) || (isRtl ? "العليا، الرياض، السعودية" : "Al Olaya, Riyadh, KSA") }
               ].map((item) => (
                 <div key={item.text} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, flexDirection: isRtl ? "row-reverse" : "row" }}>
                   <span className="icon" style={{ color: "var(--pink)", fontSize: 18 }}>{item.icon}</span>

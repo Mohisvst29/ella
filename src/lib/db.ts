@@ -52,6 +52,8 @@ async function connectToDatabase() {
           { key: 'hero_desc_ar', value: 'تصوير حفلات زفاف حصري للسيدات فقط للعروس السعودية العصرية. نوثق كل سر يهمس به وكل لحظة مضيئة بدقة سينمائية.' },
           { key: 'font_en', value: 'Playfair Display' },
           { key: 'font_ar', value: 'Tajawal' },
+          { key: 'admin_username', value: 'admin' },
+          { key: 'admin_password', value: 'ayla2024' },
           { key: 'social_links', value: JSON.stringify({ instagram: '', twitter: '', facebook: '', linkedin: '', behance: '' }) }
         ]);
       }
@@ -128,22 +130,6 @@ async function connectToDatabase() {
             location: "Jeddah",
             year: 2023,
             featured: 1
-          },
-          {
-            title: "The Details",
-            category: "Details",
-            image_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCF77GBu85vj4zea3frOBsCHs85VymHap5GXAOAvE8q_HxL9W4fZS8b6xwXoMshhG-osK6uIi7_TKp8EMFWqILCfIuFtDvZJ3H_nZy7xecie04OQ2fIXdGpK5dynXhcaoVbK_0-6lAq3PFe7YcPo2s6rXuXrC1WCQtEUzIWBFB1UjhHz9px3L-8zmHdTK-cFRjnhd_0LwWkMDR84eAu4dYnhAFRLKhZ8oMj-4LSErfeWigHJg7qp7-Yke_ABHtm57glaRbrqQemxPB4",
-            location: "Khobar",
-            year: 2023,
-            featured: 0
-          },
-          {
-            title: "Cinematic Entrance",
-            category: "Wedding",
-            image_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuC1QLxw_iZ5pj5oqyuj-YKSX6CCd_zE4fN2Z2R2UZ0D1eYx4QlWAs1IQ3fO_jazdTNwjAPzsd_cTYzJdqm1y5KxUawgjpFW4Pgd9QUiyxoyc1S6LknwmWBqU8QOjYbY3l7rPZTvj-TWne8ReA0puQmP-ki2uWqD4YM3KV4dsicGQvBiZdM7wvY8DJZpC5aD-BM_WjOW8jzREaTw54BMTjl3SAmb0gfHWdg1n-4WMBXEXKCY3I2_B6aX1UbYb9JlDQy-WRtsgpi9VSec",
-            location: "Riyadh",
-            year: 2024,
-            featured: 0
           }
         ]);
       }
@@ -164,7 +150,9 @@ async function connectToDatabase() {
             author: "Layan Ahmed",
             read_time: "8 min read",
             read_time_ar: "8 دقائق للقراءة",
-            published: 1
+            published: 1,
+            content: "Full content for Mastering the Grand Entrance...",
+            content_ar: "المحتوى الكامل لإتقان الإطلالة المهيبة..."
           },
           {
             title: "The Symbolism of Bridal Henna: A Visual Journey",
@@ -178,42 +166,19 @@ async function connectToDatabase() {
             author: "Layan Ahmed",
             read_time: "5 min read",
             read_time_ar: "5 دقائق للقراءة",
-            published: 1
-          },
-          {
-            title: "Lighting the Desert: Outdoor Photography Challenges",
-            title_ar: "إضاءة الصحراء: تحديات التصوير الخارجي",
-            slug: "lighting-desert-outdoor",
-            excerpt: "From golden hour to the starlit reception, how we manage natural light in Al-Ula's majestic landscape.",
-            excerpt_ar: "من الساعة الذهبية إلى الاستقبال تحت النجوم، كيف ندير الضوء الطبيعي في مناظر العلا المهيبة.",
-            image_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCgviQJ2vuxLx2cDH1N9eRsvLX9R0UYsjX_nIXtwM2WHOHlDs4iGNwzlMmCjrMNokp3kPN-FM3dDO8JgI7Wu6p-_6ZIwpsWUK0FpUb71IcSIwWmKUdFLcerCMjaO7-JF2BF39F5Ymm1n4rn_R6vIETu6MlALhtcsVSgV0NuEqfdPxZNWScuo9LTiHD-CGNlk-DXaN6Zh2LOGvar7GSfwSdqahrCWBg1-SGq8mYQoQH8uZ7AzVZYfGMy7eMDMYqQ09UUmJZJMggnLVYc",
-            category: "Location",
-            category_ar: "الموقع",
-            author: "Sarah Khalid",
-            read_time: "6 min read",
-            read_time_ar: "6 دقائق للقراءة",
-            published: 1
+            published: 1,
+            content: "Full content for Bridal Henna...",
+            content_ar: "المحتوى الكامل لحناء العروس..."
           }
         ]);
       }
-      // Seed services if empty
-      const serviceCount = await Service.countDocuments();
-      if (serviceCount === 0) {
-        await Service.create([
-          { title: 'Grand Wedding Photography', title_ar: 'تصوير حفلات الزفاف الكبرى', desc: 'Artisan stills captured with high-end equipment and a female perspective.', desc_ar: 'لقطات فنية يتم التقاطها بأحدث المعدات ومن منظور نسائي احترافي.', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA8gl9ovfxB2jRQCTbyGZf00f_iGqtwraTMi6RiC-31fIzcfkziOS-_82iIRai8MMOQykDNG1aWi2DqM-Sm5PMIdyszDaIpsfr3p_LtjL4XecvYjuwelyEV7R6qS9FzoKq3BtMxcLFEJSOmnlGo4Fy6Sglxkfe1zfIi64z9zYmTOaHUBGHN85KAftGcoA3NOfTGkttHm6tyZfBFZsWQgvuhTa8p4MEtCMpOApbyZqsy-GqDFSo2fY5ORSS4cpNacMsTajnwbaN99II_', order: 1 },
-          { title: 'Cinematic Videography', title_ar: 'الفيديو السينمائي', desc: '4K storytelling films that preserve the rhythm and emotion of your night.', desc_ar: 'أفلام تروي قصتك بجودة 4K تحافظ على إيقاع ومشاعر ليلتك.', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC1QLxw_iZ5pj5oqyuj-YKSX6CCd_zE4fN2Z2R2UZ0D1eYx4QlWAs1IQ3fO_jazdTNwjAPzsd_cTYzJdqm1y5KxUawgjpFW4Pgd9QUiyxoyc1S6LknwmWBqU8QOjYbY3l7rPZTvj-TWne8ReA0puQmP-ki2uWqD4YM3KV4dsicGQvBiZdM7wvY8DJZpC5aD-BM_WjOW8jzREaTw54BMTjl3SAmb0gfHWdg1n-4WMBXEXKCY3I2_B6aX1UbYb9JlDQy-WRtsgpi9VSec', order: 2 },
-          { title: 'Bridal Portfolios', title_ar: 'جلسات تصوير العروس', desc: 'Intimate, high-fashion sessions focused on the bride\'s unique beauty.', desc_ar: 'جلسات تصوير خاصة وراقية تركز على الجمال الفريد للعروس.', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBdyLkmidK3oJvKx6vUxTqmRtvA7WtgCYNAp1FR6lxXVCdiN4MyBwoZonvdjCxDvt7GDXcNYgSQ1T8WsxqFsTOQVCPrn0AH1uAVp9oGG4559NW4enFcXCY83ZcLH6ntnbzairJa2YBeLezklYs38fmFJl16fGBxMtTzkVJWyNcyNVSU3kcPukVpiNsZIjGJ9aoWeH1rera84DnIj4k6Vp_1D4bNDBmpB9xCe0AHLT-lQB-hlcykZV5jYqsksb9hCFD0T9k3nNdlh5G0', order: 3 }
-        ]);
-      }
 
-      // Seed add-ons if empty
-      const addonCount = await Addon.countDocuments();
-      if (addonCount === 0) {
-        await Addon.create([
-          { name: 'Drone Footage', name_ar: 'تصوير درون', active: 1 },
-          { name: 'Instant Printing', name_ar: 'طباعة فورية', active: 1 },
-          { name: 'Handcrafted Album', name_ar: 'ألبوم يدوي', active: 1 },
-          { name: 'Rush Editing (7 Days)', name_ar: 'تعديل سريع (7 أيام)', active: 1 }
+      // Seed Reviews if empty
+      const reviewCount = await Review.countDocuments();
+      if (reviewCount === 0) {
+        await Review.create([
+          { client_name: 'Raghad Mohammed', client_name_ar: 'رغد محمد', comment: 'The team was incredibly professional. They made me feel so comfortable and the results were beyond my dreams.', comment_ar: 'كان الفريق محترفاً للغاية. جعلوني أشعر براحة تامة والنتائج كانت تفوق أحلامي.', rating: 5, approved: 1 },
+          { client_name: 'Deema Al-Saud', client_name_ar: 'ديمة آل سعود', comment: 'Absolute luxury. The album is a masterpiece that I will treasure forever.', comment_ar: 'فخامة مطلقة. الألبوم تحفة فنية سأعتز بها للأبد.', rating: 5, approved: 1 },
         ]);
       }
     }
@@ -314,6 +279,15 @@ const AddonSchema = new mongoose.Schema({
   active: { type: Number, default: 1 },
 }, { timestamps: true });
 
+const ReviewSchema = new mongoose.Schema({
+  client_name: { type: String, required: true },
+  client_name_ar: String,
+  comment: { type: String, required: true },
+  comment_ar: String,
+  rating: { type: Number, default: 5 },
+  approved: { type: Number, default: 0 },
+}, { timestamps: true });
+
 // Convert _id to id in JSON outputs
 const transformId = (doc: any, ret: any) => {
   ret.id = ret._id.toString();
@@ -331,6 +305,7 @@ SiteSettingSchema.set('toJSON', { transform: transformId });
 TeamMemberSchema.set('toJSON', { transform: transformId });
 ServiceSchema.set('toJSON', { transform: transformId });
 AddonSchema.set('toJSON', { transform: transformId });
+ReviewSchema.set('toJSON', { transform: transformId });
 
 // ================= MODELS =================
 
@@ -343,5 +318,6 @@ export const SiteSetting = mongoose.models.SiteSetting || mongoose.model('SiteSe
 export const TeamMember = mongoose.models.TeamMember || mongoose.model('TeamMember', TeamMemberSchema);
 export const Service = mongoose.models.Service || mongoose.model('Service', ServiceSchema);
 export const Addon = mongoose.models.Addon || mongoose.model('Addon', AddonSchema);
+export const Review = mongoose.models.Review || mongoose.model('Review', ReviewSchema);
 
 export default connectToDatabase;

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState } from "react";
+import { getMediaUrl } from "@/lib/utils";
 
 interface BlogPost {
   id: string;
@@ -97,24 +98,30 @@ export default function BlogPage() {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 32 }}>
-          {posts.map((post) => (
-            <Link key={post.id} href={`/blog/${post.slug}`} className="blog-card" style={{ display: "flex", flexDirection: "column", gap: 20, textAlign: isRtl ? "right" : "left" }}>
-              <div style={{ aspectRatio: "4/5", borderRadius: "var(--radius)", overflow: "hidden", position: "relative", background: "var(--bg-3)" }}>
-                {post.image_url && <img src={post.image_url} alt={isRtl && post.title_ar ? post.title_ar : post.title} className="blog-img" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.6s" }} />}
-                <div style={{ position: "absolute", top: 16, [isRtl ? 'right' : 'left']: 16, background: "rgba(26,17,20,0.8)", backdropFilter: "blur(8px)", padding: "4px 12px", borderRadius: 20, fontSize: 10, fontWeight: 700, color: "var(--pink)", textTransform: "uppercase" }}>{isRtl && post.category_ar ? post.category_ar : post.category}</div>
-              </div>
-              <div>
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>{isRtl && post.title_ar ? post.title_ar : post.title}</h3>
-                <p style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 20, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{isRtl && post.excerpt_ar ? post.excerpt_ar : post.excerpt}</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, flexDirection: isRtl ? "row-reverse" : "row" }}>
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(255,176,204,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}><span className="icon" style={{ fontSize: 14, color: "var(--pink)" }}>person</span></div>
-                  <span style={{ fontSize: 12, color: "var(--text-dim)" }}>{post.author}</span>
-                  <span style={{ width: 3, height: 3, borderRadius: "50%", background: "var(--border)" }} />
-                  <span style={{ fontSize: 12, color: "var(--text-dim)" }}>{isRtl && post.read_time_ar ? post.read_time_ar : post.read_time}</span>
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <Link key={post.id} href={`/blog/${post.slug}`} className="blog-card" style={{ display: "flex", flexDirection: "column", gap: 20, textAlign: isRtl ? "right" : "left" }}>
+                <div style={{ aspectRatio: "4/5", borderRadius: "var(--radius)", overflow: "hidden", position: "relative", background: "var(--bg-3)" }}>
+                  {post.image_url && <img src={getMediaUrl(post.image_url)} alt={isRtl && post.title_ar ? post.title_ar : post.title} className="blog-img" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.6s" }} />}
+                  <div style={{ position: "absolute", top: 16, [isRtl ? 'right' : 'left']: 16, background: "rgba(26,17,20,0.8)", backdropFilter: "blur(8px)", padding: "4px 12px", borderRadius: 20, fontSize: 10, fontWeight: 700, color: "var(--pink)", textTransform: "uppercase" }}>{isRtl && post.category_ar ? post.category_ar : post.category}</div>
                 </div>
-              </div>
-            </Link>
-          ))}
+                <div>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>{isRtl && post.title_ar ? post.title_ar : post.title}</h3>
+                  <p style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 20, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{isRtl && post.excerpt_ar ? post.excerpt_ar : post.excerpt}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, flexDirection: isRtl ? "row-reverse" : "row" }}>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(255,176,204,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}><span className="icon" style={{ fontSize: 14, color: "var(--pink)" }}>person</span></div>
+                    <span style={{ fontSize: 12, color: "var(--text-dim)" }}>{post.author}</span>
+                    <span style={{ width: 3, height: 3, borderRadius: "50%", background: "var(--border)" }} />
+                    <span style={{ fontSize: 12, color: "var(--text-dim)" }}>{isRtl && post.read_time_ar ? post.read_time_ar : post.read_time}</span>
+                  </div>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "80px 0", color: "var(--text-dim)" }}>
+              {isRtl ? "لا توجد مقالات منشورة حالياً." : "No articles published yet."}
+            </div>
+          )}
         </div>
       </section>
 

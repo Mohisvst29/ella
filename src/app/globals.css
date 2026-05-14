@@ -189,13 +189,18 @@ details summary::-webkit-details-marker { display: none; }
 
 .reveal-left {
   opacity: 0;
-  transform: translateX(-40px);
+  transform: translateX(-20px);
   transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+[dir="rtl"] .reveal-left {
+  transform: translateX(20px);
 }
 
 .reveal-left.active {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateX(0) !important;
 }
 
 .reveal-scale {
@@ -207,6 +212,34 @@ details summary::-webkit-details-marker { display: none; }
 .reveal-scale.active {
   opacity: 1;
   transform: scale(1);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+[dir="rtl"] .reveal-right {
+  transform: translateX(-20px);
+}
+
+.reveal-right.active {
+  opacity: 1;
+  transform: translateX(0) !important;
+}
+
+.reveal-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+.reveal-up.active {
+  opacity: 1;
+  transform: translateY(0) !important;
 }
 
 /* Animations */
@@ -226,7 +259,13 @@ details summary::-webkit-details-marker { display: none; }
 
 .anim-fade-up {
   opacity: 0;
-  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.anim-fade-up.active {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .delay-1 { animation-delay: 0.1s; }
@@ -327,6 +366,33 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(255,176,204,0.12);
 }
 textarea { resize: vertical; }
+
+/* ── RTL Support ─────────────────────────────── */
+[dir="rtl"] {
+  text-align: right;
+  font-family: var(--font-ar), var(--font-body);
+}
+
+[dir="rtl"] .eyebrow { letter-spacing: 0; }
+[dir="rtl"] .btn { letter-spacing: 0; }
+[dir="rtl"] .grad-text { padding: 2px 4px; } /* Prevents clipping */
+
+/* Fix for first letter clipping in italic/fancy fonts */
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3 {
+  line-height: 1.5;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+h1, h2, h3, .font-display {
+  padding-inline: 12px;
+  overflow: visible !important;
+}
+
+/* Ensure container has enough space for RTL characters */
+.container {
+  padding-inline: var(--px);
+}
 
 /* ── Masonry ─────────────────────────────────── */
 .masonry { columns: 3; column-gap: 20px; }

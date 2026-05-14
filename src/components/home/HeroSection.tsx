@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useSettings } from "@/context/SettingsContext";
 
+import { getMediaUrl } from "@/lib/utils";
+
 export default function HeroSection() {
   const { t, isRtl } = useLanguage();
   const settings = useSettings();
@@ -12,30 +14,8 @@ export default function HeroSection() {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Function to convert Google Drive link to direct streamable link
-  const getDirectLink = (url: string) => {
-    if (!url) return "";
-    
-    // Google Drive handling
-    if (url.includes("drive.google.com")) {
-      let id = "";
-      if (url.includes("/d/")) {
-        id = url.split("/d/")[1]?.split("/")[0] || "";
-      } else if (url.includes("id=")) {
-        id = url.split("id=")[1]?.split("&")[0] || "";
-      }
-      
-      if (id) {
-        // This format is more reliable for direct streaming in <video> tags
-        // However, note that large files (>100MB) might still be blocked by Google's virus scan warning
-        return `https://drive.google.com/uc?export=download&id=${id}`;
-      }
-    }
-
-    // YouTube handling (Simple check - though <video> won't play it directly, 
-    // we could eventually add iframe support for YouTube if needed)
-    return url;
-  };
+  const videoUrl = getMediaUrl(settings?.hero_video_url || "", true);
+  const isEmbed = videoUrl.includes("embed") || videoUrl.includes("preview");
 
   const images = (settings?.hero_bg_url || "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop")
     .split(",")
@@ -95,26 +75,33 @@ export default function HeroSection() {
       {/* BG Image or Video */}
       <div style={{ position: "absolute", inset: 0 }}>
         {settings?.hero_video_url ? (
-          <>
-            <video 
-              ref={videoRef}
-              src={getDirectLink(settings.hero_video_url)} 
-              autoPlay loop muted={isMuted} playsInline 
-              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", opacity: 0.6 }} 
+          isEmbed ? (
+            <iframe
+              src={videoUrl}
+              style={{ width: "100vw", height: "56.25vw", minHeight: "100vh", minWidth: "177.77vh", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", border: "none", pointerEvents: "none", opacity: 0.6 }}
+              allow="autoplay; encrypted-media"
             />
-            {/* Sound Toggle */}
-            <button 
-              onClick={() => setIsMuted(!isMuted)}
-              style={{
-                position: "absolute", bottom: 40, [isRtl ? 'left' : 'right']: 40,
-                width: 48, height: 48, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)",
-                background: "rgba(0,0,0,0.3)", backdropFilter: "blur(8px)", color: "#fff",
-                display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10
-              }}
-            >
-              <span className="icon" style={{ fontSize: 20 }}>{isMuted ? "volume_off" : "volume_up"}</span>
-            </button>
-          </>
+          ) : (
+            <>
+              <video 
+                ref={videoRef}
+                src={videoUrl} 
+                autoPlay loop muted={isMuted} playsInline 
+                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", opacity: 0.6 }} 
+              />
+              <button 
+                onClick={() => setIsMuted(!isMuted)}
+                style={{
+                  position: "absolute", bottom: 40, [isRtl ? 'left' : 'right']: 40,
+                  width: 48, height: 48, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)",
+                  background: "rgba(0,0,0,0.3)", backdropFilter: "blur(8px)", color: "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10
+                }}
+              >
+                <span className="icon" style={{ fontSize: 20 }}>{isMuted ? "volume_off" : "volume_up"}</span>
+              </button>
+            </>
+          )
         ) : (
           images.map((img, idx) => (
             <img
@@ -131,7 +118,7 @@ export default function HeroSection() {
             />
           ))
         )}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,10,12,0.4), rgba(10,10,12,0.8))" }} />
       </div>
 
       {/* Content */}

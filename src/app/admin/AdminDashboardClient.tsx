@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
@@ -23,7 +23,18 @@ interface AdminProps {
 const englishFonts = ["Playfair Display", "Inter", "Roboto", "Montserrat", "Cinzel", "Cormorant Garamond", "Libre Baskerville", "Bodoni Moda", "Prata"];
 const arabicFonts = ["Tajawal", "Cairo", "Almarai", "Amiri", "Reem Kufi", "El Messiri", "Changa", "Harmattan", "Lalezar"];
 
-export default function AdminDashboardClient({ bookings, stats, galleryItems = [], blogPosts = [], packages = [], subscribers = [], settings = {}, teamMembers = [], services = [], addons = [] }: AdminProps) {
+export default function AdminDashboardClient({ 
+  bookings: initialBookings, 
+  stats, 
+  galleryItems = [], 
+  blogPosts = [], 
+  packages: initialPackages = [], 
+  subscribers = [], 
+  settings = {}, 
+  teamMembers = [], 
+  services: initialServices = [], 
+  addons: initialAddons = [] 
+}: AdminProps) {
   const { t, isRtl } = useLanguage();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("Overview");
@@ -33,13 +44,26 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
   const [settingsState, setSettingsState] = useState(settings);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [notification, setNotification] = useState<{message:string, type:'success'|'error'} | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [loginForm, setLoginForm] = useState({ user: '', pass: '' });
+  
+  const [bookingsList, setBookingsList] = useState(initialBookings);
+  const [packagesList, setPackagesList] = useState(initialPackages);
+  const [galleryList, setGalleryList] = useState(galleryItems);
+  const [postsList, setPostsList] = useState(blogPosts);
+  const [teamList, setTeamList] = useState(teamMembers);
+  const [servicesList, setServicesList] = useState(initialServices);
+  const [addonsList, setAddonsList] = useState(initialAddons);
+  const [reviews, setReviews] = useState<any[]>([]);
+
   const [editingPost, setEditingPost] = useState<any>(null);
   const [editingPackage, setEditingPackage] = useState<any>(null);
   const [addingGalleryImage, setAddingGalleryImage] = useState<any>(null);
   const [editingTeamMember, setEditingTeamMember] = useState<any>(null);
   const [editingService, setEditingService] = useState<any>(null);
   const [editingAddon, setEditingAddon] = useState<any>(null);
-  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [editingReview, setEditingReview] = useState<any>(null);
 
   const notify = (message: string, type: 'success' | 'error' = 'success') => {
     setNotification({ type, message });
@@ -59,7 +83,6 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           const MAX_HEIGHT = 2500;
           let width = img.width;
           let height = img.height;
-
           if (width > height) {
             if (width > MAX_WIDTH) {
               height *= MAX_WIDTH / width;
@@ -86,17 +109,14 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
     setIsUploading(true);
     try {
       let fileToUpload: File | Blob = file;
       if (file.type.startsWith('image/')) {
         fileToUpload = await compressImage(file);
       }
-      
       const formData = new FormData();
       formData.append("file", fileToUpload, file.name);
-      
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
       if (data.url) {
@@ -113,6 +133,114 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     }
   };
 
+  const savePost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      const isNew = !editingPost.id;
+      const res = await fetch(isNew ? "/api/blog" : `/api/blog/${editingPost.id}`, {
+        method: isNew ? "POST" : "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingPost)
+      });
+      if (res.ok) {
+        notify(isRtl ? "تم حفظ المقال بنجاح" : "Post saved successfully");
+        setEditingPost(null);
+        const postsRes = await fetch("/api/blog");
+        const postsData = await postsRes.json();
+        setPostsList(postsData);
+      }
+    } catch (e) {
+      notify(isRtl ? "فشل في حفظ المقال" : "Failed to save post", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deletePost = async (id: string) => {
+    if (!confirm(isRtl ? "هل أنت متأكد من حذف هذا المقال؟" : "Are you sure you want to delete this post?")) return;
+    try {
+      const res = await fetch(`/api/blog/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setPostsList(prev => prev.filter(p => p.id !== id));
+        notify(isRtl ? "تم حذف المقال" : "Post deleted");
+      }
+    } catch (e) {
+      notify(isRtl ? "فشل الحذف" : "Delete failed", "error");
+    }
+  };
+
+  const saveReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      const isNew = !editingReview.id;
+      const res = await fetch(isNew ? "/api/reviews" : `/api/reviews/${editingReview.id}`, {
+        method: isNew ? "POST" : "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingReview)
+      });
+      if (res.ok) {
+        notify(isRtl ? "تم حفظ المراجعة" : "Review saved");
+        setEditingReview(null);
+        fetch("/api/reviews").then(r => r.json()).then(setReviews);
+      }
+    } catch (e) {
+      notify(isRtl ? "فشل الحفظ" : "Save failed", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const publishPost = async (id: string, status: number) => {
+    try {
+      const res = await fetch(`/api/blog/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ published: status })
+      });
+      if (res.ok) {
+        setPostsList(prev => prev.map(p => p.id === id ? { ...p, published: status } : p));
+        notify(status ? (isRtl ? "تم النشر" : "Published") : (isRtl ? "تم الإيقاف" : "Stopped"));
+      }
+    } catch (e) {
+      notify("Error", "error");
+    }
+  };
+
+  useEffect(() => {
+    const auth = localStorage.getItem('ayla_admin_auth');
+    if (auth === 'true') setIsAuthorized(true);
+    
+    fetch("/api/bookings").then(r => r.json()).then(setBookingsList);
+    fetch("/api/packages").then(r => r.json()).then(setPackagesList);
+    fetch("/api/gallery").then(r => r.json()).then(setGalleryList);
+    fetch("/api/blog").then(r => r.json()).then(setPostsList);
+    fetch("/api/team").then(r => r.json()).then(setTeamList);
+    fetch("/api/services").then(r => r.json()).then(setServicesList);
+    fetch("/api/addons").then(r => r.json()).then(setAddonsList);
+    fetch("/api/reviews").then(r => r.json()).then(setReviews);
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const correctUser = settingsState.admin_username || 'admin';
+    const correctPass = settingsState.admin_password || 'ayla2024';
+    
+    if (loginForm.user === correctUser && loginForm.pass === correctPass) {
+      setIsAuthorized(true);
+      localStorage.setItem('ayla_admin_auth', 'true');
+      notify(isRtl ? "تم تسجيل الدخول" : "Logged in successfully");
+    } else {
+      notify(isRtl ? "بيانات غير صحيحة" : "Invalid credentials", "error");
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthorized(false);
+    localStorage.removeItem('ayla_admin_auth');
+  };
+
   const statusMap: Record<string, { label: string; bg: string; color: string }> = {
     pending:   { label: isRtl ? "قيد الانتظار" : "PENDING",   bg: "rgba(255,176,204,0.12)", color: "#ffb0cc" },
     confirmed: { label: isRtl ? "مؤكد" : "CONFIRMED", bg: "rgba(145,205,255,0.12)", color: "#91cdff" },
@@ -121,7 +249,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     "follow-up": { label: isRtl ? "متابعة" : "FOLLOW UP", bg: "rgba(209,188,255,0.12)", color: "#d1bcff" },
   };
 
-  const filtered = filter === "all" ? bookings : bookings.filter(b => b.status === filter);
+  const filtered = filter === "all" ? bookingsList : bookingsList.filter(b => b.status === filter);
 
   const updateStatus = async (id: string, status: string) => {
     setBusy(id);
@@ -207,6 +335,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
     { id: "Team", icon: "badge", label: isRtl ? "فريق العمل" : "Team" },
     { id: "Services", icon: "photo_camera", label: isRtl ? "الخدمات" : "Services" },
     { id: "Addons", icon: "add_circle", label: isRtl ? "الخدمات الإضافية" : "Add-ons" },
+    { id: "Reviews", icon: "star", label: isRtl ? "المراجعات" : "Reviews" },
     { id: "Settings", icon: "settings", label: isRtl ? "الإعدادات" : "Settings" },
   ];
 
@@ -446,7 +575,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
               <button onClick={() => setEditingPackage({ name: "", name_ar: "", price: 0, description: "", description_ar: "", features: [], features_ar: [] })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ باقة جديدة</button>
             </div>
             <div style={s({ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 })}>
-              {packages.map((pkg: any) => (
+              {packagesList.map((pkg: any) => (
                 <div key={pkg.id} style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 24 })}>
                   <div style={s({ display: "flex", justifyContent: "space-between", marginBottom: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
                     <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 600, color: "var(--pink)" })}>{isRtl ? (pkg.name_ar || pkg.name) : pkg.name}</h3>
@@ -481,7 +610,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                   </tr>
                 </thead>
                 <tbody>
-                  {bookings.map(b => {
+                  {bookingsList.map(b => {
                     const st = statusMap[b.status] || statusMap.pending;
                     return (
                       <tr key={b.id} style={s({ borderTop: "1px solid var(--border)" })}>
@@ -502,6 +631,44 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                   })}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "Blog" && (
+          <div className="anim-fade-up">
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? "إدارة المدونة" : "Blog Management"}</h2>
+              <button 
+                onClick={() => setEditingPost({ 
+                  title: "", title_ar: "", slug: "", excerpt: "", excerpt_ar: "", 
+                  content: "", content_ar: "", image_url: "", category: "Wedding", 
+                  category_ar: "زفاف", read_time: "5 min read", read_time_ar: "5 دقائق للقراءة", 
+                  published: 1 
+                })} 
+                className="btn btn-primary" 
+                style={s({ padding: "8px 16px", fontSize: 12 })}
+              >
+                + {isRtl ? "مقال جديد" : "New Post"}
+              </button>
+            </div>
+            <div style={s({ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 })}>
+              {postsList.map(post => (
+                <div key={post.id} style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden", display: "flex", flexDirection: "column" })}>
+                  <div style={s({ height: 160, backgroundImage: `url(${post.image_url})`, backgroundSize: "cover", backgroundPosition: "center" })} />
+                  <div style={s({ padding: 20, flex: 1, textAlign: isRtl ? "right" : "left" })}>
+                    <div style={s({ fontSize: 10, fontWeight: 700, color: "var(--pink)", textTransform: "uppercase", marginBottom: 8 })}>{isRtl ? post.category_ar : post.category}</div>
+                    <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 12, color: "var(--text)" })}>{isRtl ? post.title_ar : post.title}</h3>
+                    <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", flexDirection: isRtl ? "row-reverse" : "row" })}>
+                      <div style={s({ display: "flex", gap: 8 })}>
+                        <button onClick={() => setEditingPost(post)} style={s({ background: "none", border: "none", color: "var(--cyan)", cursor: "pointer", fontSize: 12 })}>{isRtl ? "تعديل" : "Edit"}</button>
+                        <button onClick={() => deletePost(post.id)} style={s({ background: "none", border: "none", color: "#ff4d4d", cursor: "pointer", fontSize: 12 })}>{isRtl ? "حذف" : "Delete"}</button>
+                      </div>
+                      <span style={s({ fontSize: 11, color: post.published ? "var(--cyan)" : "var(--text-dim)" })}>{post.published ? (isRtl ? "منشور" : "Published") : (isRtl ? "مسودة" : "Draft")}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -581,7 +748,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
           <div>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? "الخدمات" : "Services"}</h2>
-              <button onClick={() => setEditingService({ title: "", title_ar: "", desc: "", desc_ar: "", image_url: "", order: services.length + 1 })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ خدمة جديدة</button>
+              <button onClick={() => setEditingService({ title: "", title_ar: "", desc: "", desc_ar: "", image_url: "", order: servicesList.length + 1 })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ خدمة جديدة</button>
             </div>
             <div style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden" })}>
               <table style={s({ width: "100%", borderCollapse: "collapse", textAlign: isRtl ? "right" : "left" })}>
@@ -592,7 +759,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                   </tr>
                 </thead>
                 <tbody>
-                  {services.map((service: any) => (
+                  {servicesList.map((service: any) => (
                     <tr key={service.id} style={s({ borderTop: "1px solid var(--border)" })}>
                       <td style={s({ padding: "16px 20px" })}>
                         <div style={s({ display: "flex", alignItems: "center", gap: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
@@ -634,7 +801,7 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                   </tr>
                 </thead>
                 <tbody>
-                  {addons.map((addon: any) => (
+                  {addonsList.map((addon: any) => (
                     <tr key={addon.id} style={s({ borderTop: "1px solid var(--border)" })}>
                       <td style={s({ padding: "16px 20px" })}>
                         <div style={s({ fontSize: 14, fontWeight: 600 })}>{isRtl ? (addon.name_ar || addon.name) : addon.name}</div>
@@ -865,6 +1032,23 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                 </div>
                 
                 {/* Slide 1 */}
+                {/* Hero Media */}
+                <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,176,204,0.02)", borderRadius: 12, border: "1px solid var(--pink)" })}>
+                  <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--pink)" })}>{isRtl ? "فيديو الخلفية والصور" : "Background Video & Images"}</h4>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "رابط فيديو الهيرو (YouTube/Drive)" : "Hero Video URL (YouTube/Drive)"}</label>
+                        <input type="text" value={settingsState.hero_video_url || ""} onChange={e => setSettingsState({ ...settingsState, hero_video_url: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} placeholder="https://..." />
+                      </div>
+                      <div>
+                        <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "صور الهيرو (روابط مفصولة بفاصلة)" : "Hero Background Images (Comma separated URLs)"}</label>
+                        <input type="text" value={settingsState.hero_bg_url || ""} onChange={e => setSettingsState({ ...settingsState, hero_bg_url: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} placeholder="https://..., https://..." />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,255,255,0.01)", borderRadius: 12, border: "1px solid var(--border)" })}>
                   <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--pink)" })}>{isRtl ? "الشريحة 1 (الأساسية)" : "Slide 1 (Main)"}</h4>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
@@ -1048,6 +1232,33 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                 </div>
               </div>
 
+              {/* Contact Info Section */}
+              <div>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "معلومات التواصل" : "Contact Information"}</h3>
+                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "البريد الإلكتروني" : "Contact Email"}</label>
+                    <input type="email" value={settingsState.contact_email || ""} onChange={e => setSettingsState({ ...settingsState, contact_email: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="studio@aylamedia.sa" />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رقم الهاتف" : "Contact Phone"}</label>
+                    <input type="text" value={settingsState.contact_phone || ""} onChange={e => setSettingsState({ ...settingsState, contact_phone: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="966500000000" />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "العنوان (EN)" : "Address (EN)"}</label>
+                    <input type="text" value={settingsState.contact_address || ""} onChange={e => setSettingsState({ ...settingsState, contact_address: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="Riyadh, KSA" />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "العنوان (AR)" : "Address (AR)"}</label>
+                    <input type="text" value={settingsState.contact_address_ar || ""} onChange={e => setSettingsState({ ...settingsState, contact_address_ar: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14, textAlign: "right" })} placeholder="الرياض، السعودية" />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8, gridColumn: "span 2" })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رابط الخريطة (Google Maps Embed)" : "Google Maps Embed URL"}</label>
+                    <input type="text" value={settingsState.contact_map_url || ""} onChange={e => setSettingsState({ ...settingsState, contact_map_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://www.google.com/maps/embed?..." />
+                  </div>
+                </div>
+              </div>
+
               {/* Social Media Section */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>روابط السوشيال ميديا</h3>
@@ -1145,30 +1356,24 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                 </div>
               </div>
 
-              {/* Contact Info Section */}
+              {/* Administrative Access */}
               <div>
-                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "معلومات التواصل" : "Contact Info"}</h3>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "بيانات الدخول للوحة التحكم" : "Admin Dashboard Access"}</h3>
                 <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
-                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رقم الهاتف" : "Phone Number"}</label>
-                    <input type="text" value={settingsState.contact_phone || ""} onChange={e => setSettingsState({ ...settingsState, contact_phone: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="+966 ..." />
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "اسم المستخدم" : "Admin Username"}</label>
+                    <input type="text" value={settingsState.admin_username || ""} onChange={e => setSettingsState({ ...settingsState, admin_username: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="admin" />
                   </div>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
-                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "البريد الإلكتروني" : "Contact Email"}</label>
-                    <input type="email" value={settingsState.contact_email || ""} onChange={e => setSettingsState({ ...settingsState, contact_email: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="info@..." />
-                  </div>
-                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
-                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "العنوان" : "Physical Address"}</label>
-                    <input type="text" value={settingsState.contact_address || ""} onChange={e => setSettingsState({ ...settingsState, contact_address: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder={isRtl ? "الرياض، السعودية" : "Riyadh, KSA"} />
-                  </div>
-                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
-                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رابط جوجل ماب (Embed URL)" : "Google Maps Link (Embed URL)"}</label>
-                    <input type="text" value={settingsState.contact_map_url || ""} onChange={e => setSettingsState({ ...settingsState, contact_map_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://www.google.com/maps/embed?..." />
-                    <span style={s({ fontSize: 11, color: "var(--text-muted)" })}>{isRtl ? "هام: استخدم رابط 'تضمين خريطة' (Embed) وليس رابط المشاركة العادي." : "Important: Use 'Embed a map' URL from Google Maps share menu."}</span>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "كلمة السر الجديدة" : "New Admin Password"}</label>
+                    <input type="text" value={settingsState.admin_password || ""} onChange={e => setSettingsState({ ...settingsState, admin_password: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="••••••••" />
                   </div>
                 </div>
+                <p style={s({ fontSize: 11, color: "var(--text-muted)", marginTop: 12 })}>{isRtl ? "ملاحظة: سيتم تطبيق كلمة السر الجديدة فور حفظ الإعدادات." : "Note: The new password will be active as soon as you save settings."}</p>
               </div>
 
+            </div>
+          </div>
               {/* Save Button for Settings */}
               <div style={s({ borderTop: "1px solid var(--border)", paddingTop: 32, marginTop: 16, display: "flex", justifyContent: "flex-end" })}>
                 <button 
@@ -1176,13 +1381,15 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
                     setIsSaving(true);
                     try {
                       const res = await fetch("/api/settings", {
-                        method: "POST",
+                        method: "PATCH",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(settingsState),
                       });
                       if (res.ok) {
                         notify(isRtl ? "تم حفظ الإعدادات بنجاح" : "Settings saved successfully");
+                        // Clear client-side cache and re-fetch
                         router.refresh();
+                        setTimeout(() => window.location.reload(), 1000); // Forced reload to ensure settings are picked up everywhere
                       } else {
                         notify(isRtl ? "فشل الحفظ" : "Save failed", "error");
                       }
@@ -1202,9 +1409,74 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
 
             </div>
           </div>
-        </div>
-      </div>
-    )}
+        )}
+
+        {activeTab === "Reviews" && (
+          <div className="anim-fade-up">
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h2 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{isRtl ? "مراجعات العملاء" : "Client Reviews"}</h2>
+              <button onClick={() => setEditingReview({ client_name: "", client_name_ar: "", comment: "", comment_ar: "", rating: 5, approved: 1 })} className="btn btn-primary" style={s({ padding: "8px 16px", fontSize: 12 })}>+ {isRtl ? "إضافة مراجعة" : "Add Review"}</button>
+            </div>
+            <div style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden" })}>
+              <table style={s({ width: "100%", borderCollapse: "collapse", textAlign: isRtl ? "right" : "left" })}>
+                <thead>
+                  <tr style={s({ background: "rgba(255,255,255,0.02)" })}>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "العميل" : "Client"}</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "المراجعة" : "Review"}</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "الحالة" : "Status"}</th>
+                    <th style={s({ padding: "12px 20px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" })}>{isRtl ? "إجراءات" : "Actions"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reviews.map((rev: any) => (
+                    <tr key={rev.id} style={s({ borderTop: "1px solid var(--border)" })}>
+                      <td style={s({ padding: "16px 20px" })}>
+                        <div style={s({ fontSize: 14, fontWeight: 600 })}>{isRtl ? (rev.client_name_ar || rev.client_name) : rev.client_name}</div>
+                        <div style={s({ color: "var(--pink)", fontSize: 12, marginTop: 4 })}>{"★".repeat(rev.rating)}</div>
+                      </td>
+                      <td style={s({ padding: "16px 20px", fontSize: 13, color: "var(--text-dim)", maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" })}>
+                        {isRtl ? (rev.comment_ar || rev.comment) : rev.comment}
+                      </td>
+                      <td style={s({ padding: "16px 20px" })}>
+                        <span style={s({ padding: "4px 10px", borderRadius: 20, fontSize: 10, background: rev.approved ? "rgba(145,205,255,0.12)" : "rgba(255,255,255,0.1)", color: rev.approved ? "#91cdff" : "var(--text-muted)" })}>
+                          {rev.approved ? (isRtl ? "معتمد" : "Approved") : (isRtl ? "بانتظار الاعتماد" : "Pending")}
+                        </span>
+                      </td>
+                      <td style={s({ padding: "16px 20px" })}>
+                        <div style={s({ display: "flex", gap: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                          {!rev.approved && (
+                            <button onClick={async () => {
+                              const res = await fetch("/api/reviews", {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ id: rev.id, approved: 1 })
+                              });
+                              if (res.ok) {
+                                setReviews(reviews.map(r => r.id === rev.id ? { ...r, approved: 1 } : r));
+                                notify(isRtl ? "تم الاعتماد" : "Approved");
+                              }
+                            }} style={s({ background: "none", border: "none", color: "#4dff88", cursor: "pointer", fontSize: 13 })}>{isRtl ? "اعتماد" : "Approve"}</button>
+                          )}
+                          <button onClick={() => setEditingReview(rev)} style={s({ background: "none", border: "none", color: "var(--pink)", cursor: "pointer", fontSize: 13 })}>{isRtl ? "تعديل" : "Edit"}</button>
+                          <button onClick={async () => {
+                            if(confirm(isRtl ? "حذف هذه المراجعة؟" : "Delete this review?")) {
+                              const res = await fetch(`/api/reviews?id=${rev.id}`, { method: 'DELETE' });
+                              if (res.ok) {
+                                setReviews(reviews.filter(r => r.id !== rev.id));
+                                notify(isRtl ? "تم الحذف" : "Deleted");
+                              }
+                            }
+                          }} style={s({ background: "none", border: "none", color: "#ff4d4d", cursor: "pointer", fontSize: 13 })}>{isRtl ? "حذف" : "Delete"}</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {reviews.length === 0 && <tr><td colSpan={4} style={s({ padding: 20, textAlign: "center", color: "var(--text-dim)" })}>{isRtl ? "لا توجد مراجعات" : "No reviews found."}</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
   </main>
 
       {/* Booking Details Modal */}
@@ -1691,33 +1963,169 @@ export default function AdminDashboardClient({ bookings, stats, galleryItems = [
         </div>
       )}
 
-      {/* Addon Modal */}
-      {editingAddon && (
+      {/* Review Modal */}
+      {editingReview && (
         <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
-          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 500, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 600, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
-              <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingAddon.id ? (isRtl ? "تعديل خيار" : "Edit Option") : (isRtl ? "إضافة خيار" : "Add Option")}</h3>
-              <button onClick={() => setEditingAddon(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
+              <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingReview.id ? (isRtl ? "تعديل مراجعة" : "Edit Review") : (isRtl ? "إضافة مراجعة" : "Add Review")}</h3>
+              <button onClick={() => setEditingReview(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
                 <span className="icon">close</span>
               </button>
             </div>
 
-            <form onSubmit={saveAddon} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-              <div style={s({ display: "flex", flexDirection: "column", gap: 16 })}>
+            <form 
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setIsSaving(true);
+                try {
+                  const method = editingReview.id ? "PATCH" : "POST";
+                  const url = "/api/reviews";
+                  const res = await fetch(url, {
+                    method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(editingReview)
+                  });
+                  if (res.ok) {
+                    notify(isRtl ? "تم الحفظ بنجاح" : "Saved successfully");
+                    setEditingReview(null);
+                    // Refresh reviews list
+                    const rRes = await fetch("/api/reviews");
+                    const rData = await rRes.json();
+                    setReviews(rData);
+                  }
+                } catch (e) {
+                  notify(isRtl ? "خطأ في الحفظ" : "Save failed", "error");
+                } finally {
+                  setIsSaving(false);
+                }
+              }} 
+              style={s({ display: "flex", flexDirection: "column", gap: 24 })}
+            >
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
                 <div>
-                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم الخيار (EN)" : "Option Name (EN)"}</label>
-                  <input required type="text" value={editingAddon.name || ""} onChange={e => setEditingAddon({ ...editingAddon, name: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم العميل (EN)" : "Client Name (EN)"}</label>
+                  <input required type="text" value={editingReview.client_name || ""} onChange={e => setEditingReview({ ...editingReview, client_name: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
                 </div>
                 <div>
-                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم الخيار (AR)" : "Option Name (AR)"}</label>
-                  <input required type="text" value={editingAddon.name_ar || ""} onChange={e => setEditingAddon({ ...editingAddon, name_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم العميل (AR)" : "Client Name (AR)"}</label>
+                  <input required type="text" value={editingReview.client_name_ar || ""} onChange={e => setEditingReview({ ...editingReview, client_name_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "المراجعة (EN)" : "Review (EN)"}</label>
+                  <textarea rows={4} required value={editingReview.comment || ""} onChange={e => setEditingReview({ ...editingReview, comment: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "المراجعة (AR)" : "Review (AR)"}</label>
+                  <textarea rows={4} required value={editingReview.comment_ar || ""} onChange={e => setEditingReview({ ...editingReview, comment_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "التقييم (1-5)" : "Rating (1-5)"}</label>
+                  <input type="number" min="1" max="5" value={editingReview.rating || 5} onChange={e => setEditingReview({ ...editingReview, rating: parseInt(e.target.value) })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div style={s({ display: "flex", alignItems: "flex-end", paddingBottom: 12 })}>
+                  <label style={s({ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexDirection: isRtl ? "row-reverse" : "row" })}>
+                    <input type="checkbox" checked={editingReview.approved === 1} onChange={e => setEditingReview({...editingReview, approved: e.target.checked ? 1 : 0})} style={{ width: 18, height: 18 }} />
+                    <span style={s({ fontSize: 14, fontWeight: 600 })}>{isRtl ? "معتمد (يظهر بالموقع)" : "Approved (Visible on site)"}</span>
+                  </label>
                 </div>
               </div>
 
               <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
-                <button type="button" onClick={() => setEditingAddon(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
+                <button type="button" onClick={() => setEditingReview(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
                 <button type="submit" disabled={isSaving} className="btn btn-primary">
-                  {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Option")}
+                  {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ المراجعة" : "Save Review")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Blog Modal */}
+      {editingPost && (
+        <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
+          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 900, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingPost.id ? (isRtl ? "تعديل مقال" : "Edit Post") : (isRtl ? "مقال جديد" : "New Post")}</h3>
+              <button onClick={() => setEditingPost(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
+                <span className="icon">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={savePost} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
+                  <input required type="text" value={editingPost.title || ""} onChange={e => setEditingPost({ ...editingPost, title: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (AR)" : "Title (AR)"}</label>
+                  <input required type="text" value={editingPost.title_ar || ""} onChange={e => setEditingPost({ ...editingPost, title_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الرابط المختصر (Slug)" : "Slug"}</label>
+                  <input required type="text" value={editingPost.slug || ""} onChange={e => setEditingPost({ ...editingPost, slug: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "صورة الغلاف (Image URL)" : "Cover Image"}</label>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input type="text" value={editingPost.image_url || ""} onChange={e => setEditingPost({ ...editingPost, image_url: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                    <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                      <span className="icon">upload</span>
+                      <input type="file" accept="image/*" style={{ display: "none" }} onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setIsUploading(true);
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        try {
+                          const res = await fetch("/api/upload", { method: "POST", body: formData });
+                          const data = await res.json();
+                          if (data.url) setEditingPost({ ...editingPost, image_url: data.url });
+                        } finally {
+                          setIsUploading(false);
+                        }
+                      }} />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "مقتطف (EN)" : "Excerpt (EN)"}</label>
+                  <textarea rows={2} value={editingPost.excerpt || ""} onChange={e => setEditingPost({ ...editingPost, excerpt: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "مقتطف (AR)" : "Excerpt (AR)"}</label>
+                  <textarea rows={2} value={editingPost.excerpt_ar || ""} onChange={e => setEditingPost({ ...editingPost, excerpt_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "المحتوى (EN)" : "Content (EN)"}</label>
+                  <textarea rows={8} value={editingPost.content || ""} onChange={e => setEditingPost({ ...editingPost, content: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
+                </div>
+                <div>
+                  <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "المحتوى (AR)" : "Content (AR)"}</label>
+                  <textarea rows={8} value={editingPost.content_ar || ""} onChange={e => setEditingPost({ ...editingPost, content_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
+                </div>
+              </div>
+
+              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+                <button type="button" onClick={() => setEditingPost(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
+                <button type="submit" disabled={isSaving || isUploading} className="btn btn-primary">
+                  {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ المقال" : "Save Post")}
                 </button>
               </div>
             </form>

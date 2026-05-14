@@ -20,15 +20,29 @@ export default function ScrollReveal() {
       });
     }, observerOptions);
 
-    // Small delay to ensure DOM is updated after navigation
-    const timeout = setTimeout(() => {
-      const revealElements = document.querySelectorAll(".reveal, .reveal-left, .reveal-scale");
+    const observeElements = () => {
+      const revealElements = document.querySelectorAll(".reveal, .reveal-left, .reveal-right, .reveal-up, .reveal-scale, .anim-fade-up");
       revealElements.forEach((el) => observer.observe(el));
-    }, 100);
+    };
+
+    // Initial check
+    observeElements();
+    
+    // Check after a short delay to handle late renders
+    const t1 = setTimeout(observeElements, 100);
+    const t2 = setTimeout(observeElements, 500);
+    const t3 = setTimeout(observeElements, 1000);
+
+    // Watch for DOM changes
+    const mutationObserver = new MutationObserver(() => observeElements());
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
 
     return () => {
-      clearTimeout(timeout);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
       observer.disconnect();
+      mutationObserver.disconnect();
     };
   }, [pathname]);
 
