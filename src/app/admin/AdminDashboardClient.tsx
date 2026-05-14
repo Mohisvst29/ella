@@ -41,6 +41,8 @@ export default function AdminDashboardClient({
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState<Booking|null>(null);
   const [busy, setBusy] = useState<string|null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [settingsState, setSettingsState] = useState(settings);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -69,6 +71,13 @@ export default function AdminDashboardClient({
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 5000);
   };
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const compressImage = (file: File): Promise<Blob> => {
     return new Promise((resolve) => {
@@ -350,8 +359,17 @@ export default function AdminDashboardClient({
 
   return (
     <div style={s({ display: "flex", minHeight: "100vh", background: "var(--bg)", color: "var(--text)", flexDirection: isRtl ? "row-reverse" : "row" })}>
+      {isMobile && (
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          style={{ position: "fixed", top: 16, [isRtl ? 'right' : 'left']: 16, zIndex: 60, background: "var(--pink)", color: "#fff", border: "none", borderRadius: 8, width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <span className="icon">{isSidebarOpen ? "close" : "menu"}</span>
+        </button>
+      )}
+      
       {/* Sidebar */}
-      <aside style={s({ width: 220, flexShrink: 0, background: "var(--bg-2)", borderRight: isRtl ? "none" : "1px solid var(--border)", borderLeft: isRtl ? "1px solid var(--border)" : "none", display: "flex", flexDirection: "column", padding: "28px 0", position: "fixed", top: 0, [isRtl ? 'right' : 'left']: 0, height: "100vh", zIndex: 50, textAlign: isRtl ? "right" : "left" })}>
+      <aside style={s({ width: 220, flexShrink: 0, background: "var(--bg-2)", borderRight: isRtl ? "none" : "1px solid var(--border)", borderLeft: isRtl ? "1px solid var(--border)" : "none", display: "flex", flexDirection: "column", padding: "28px 0", position: "fixed", top: 0, [isRtl ? 'right' : 'left']: isMobile ? (isSidebarOpen ? 0 : -250) : 0, height: "100vh", zIndex: 50, textAlign: isRtl ? "right" : "left", transition: "all 0.3s ease" })}>
         <div style={s({ padding: "0 20px 28px", borderBottom: "1px solid var(--border)" })}>
           <div style={s({ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 700, color: "var(--pink)" })}>Ayla Media</div>
           <div style={s({ fontSize: 11, color: "var(--text-dim)", marginTop: 4 })}>{t("admin.portal")}</div>
@@ -361,7 +379,7 @@ export default function AdminDashboardClient({
           {navItems.map(item => (
             <button 
               key={item.id} 
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => { setActiveTab(item.id); if (isMobile) setIsSidebarOpen(false); }}
               style={s({
                 display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                 background: activeTab === item.id ? "rgba(255,126,179,0.12)" : "transparent",
@@ -388,7 +406,7 @@ export default function AdminDashboardClient({
       </aside>
 
       {/* Main Content Area */}
-      <main style={s({ [isRtl ? 'marginRight' : 'marginLeft']: 220, flex: 1, padding: "48px 48px 64px", overflowX: "hidden", textAlign: isRtl ? "right" : "left" })}>
+      <main style={s({ [isRtl ? 'marginRight' : 'marginLeft']: isMobile ? 0 : 220, flex: 1, padding: isMobile ? "80px 20px 64px" : "48px 48px 64px", overflowX: "hidden", textAlign: isRtl ? "right" : "left", transition: "all 0.3s ease", width: "100%" })}>
         
         {activeTab === "Overview" && (
           <>
@@ -400,7 +418,7 @@ export default function AdminDashboardClient({
             </div>
 
             {/* Stat cards */}
-            <div style={s({ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 40 })}>
+            <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: isMobile ? 12 : 20, marginBottom: 40 })}>
               {statCards.map((c, i) => (
                 <div key={i} style={s({ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 28, position: "relative", overflow: "hidden" })}>
                   <div style={s({ position: "absolute", top: 12, [isRtl ? 'left' : 'right']: 12, opacity: 0.1 })}>
@@ -431,7 +449,8 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <table style={s({ width: "100%", borderCollapse: "collapse", textAlign: isRtl ? "right" : "left" })}>
+              <div style={{ overflowX: "auto" }}>
+                <table style={s({ width: "100%", borderCollapse: "collapse", textAlign: isRtl ? "right" : "left", minWidth: 600 })}>
                 <thead>
                   <tr style={s({ background: "rgba(255,255,255,0.02)" })}>
                     {[t("admin.client"), t("admin.date"), isRtl ? "موعد المناسبة" : "Event Date", t("contact.form.package"), t("admin.status"), t("admin.action")].map(h => (
@@ -482,6 +501,7 @@ export default function AdminDashboardClient({
                   })}
                 </tbody>
               </table>
+             </div>
             </div>
           </>
         )}

@@ -12,7 +12,7 @@ export default function HeroSection() {
   const settings = useSettings();
   const [currentImg, setCurrentImg] = useState(0);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoUrl = getMediaUrl(settings?.hero_video_url || "", true);

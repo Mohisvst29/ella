@@ -29,8 +29,17 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: { template: "%s | Ayla Media", default: "Ayla Media | Female-Only Wedding Photography Saudi Arabia" },
+  metadataBase: new URL("https://eellaawedding.com"),
+  title: { template: "%s | Ella Media", default: "Ella Media | Female-Only Wedding Photography Saudi Arabia" },
   description: "Saudi Arabia's premier female-only wedding photography studio. Cinematic, editorial, and deeply private.",
+  openGraph: {
+    title: "Ella Media",
+    description: "Saudi Arabia's premier female-only wedding photography studio.",
+    url: "https://eellaawedding.com",
+    siteName: "Ella Media",
+    locale: "ar_SA",
+    type: "website",
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
