@@ -12,7 +12,7 @@ export default function HeroSection() {
   const settings = useSettings();
   const [currentImg, setCurrentImg] = useState(0);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoUrl = getMediaUrl(settings?.hero_video_url || "", true);
@@ -192,15 +192,19 @@ export default function HeroSection() {
       {/* Sound Toggle Button */}
       {settings?.hero_video_url && !isEmbed && (
         <button
-          onClick={() => setIsMuted(!isMuted)}
+          onClick={() => {
+            setIsMuted(!isMuted);
+            if (videoRef.current) {
+              videoRef.current.muted = !isMuted;
+            }
+          }}
           style={{
-            position: "absolute",
-            bottom: 40,
-            right: isRtl ? "auto" : 40,
-            left: isRtl ? 40 : "auto",
-            zIndex: 10,
-            background: "rgba(255,255,255,0.1)",
-            border: "1px solid rgba(255,255,255,0.2)",
+            position: "fixed",
+            bottom: 104,
+            left: "var(--wa-left, auto)",
+            right: "var(--wa-right, 32px)",
+            zIndex: 90,
+            background: "var(--pink)",
             color: "#fff",
             width: 48,
             height: 48,
@@ -210,7 +214,8 @@ export default function HeroSection() {
             justifyContent: "center",
             cursor: "pointer",
             backdropFilter: "blur(10px)",
-            transition: "all 0.3s ease"
+            transition: "all 0.3s ease",
+            boxShadow: "0 10px 20px rgba(0,0,0,0.3)"
           }}
           aria-label="Toggle Sound"
         >
