@@ -57,9 +57,16 @@ export default function PromoPopup() {
         <div style={{ padding: 32 }}>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, color: "var(--pink)", marginBottom: 12 }}>{title}</h2>
           <p style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.6, marginBottom: 24, whiteSpace: "pre-wrap" }}>{text}</p>
-          <Link href="/contact" className="btn btn-primary" style={{ display: "block", width: "100%", padding: 14, textAlign: "center" }} onClick={() => setIsOpen(false)}>
+          <a 
+            href={`https://wa.me/${settings?.social_whatsapp || "966500000000"}?text=${encodeURIComponent(isRtl ? "مرحباً، أريد الاستفسار عن هذا العرض: " + title : "Hello, I want to inquire about this offer: " + title)}`} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="btn btn-primary" 
+            style={{ display: "block", width: "100%", padding: 14, textAlign: "center" }} 
+            onClick={() => setIsOpen(false)}
+          >
             {isRtl ? "اطلبي العرض الان" : "Order the offer now"}
-          </Link>
+          </a>
         </div>
       </div>
     </div>
