@@ -15,7 +15,7 @@ export default function HeroSection() {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const videoUrl = getMediaUrl(settings?.hero_video_url || "", true);
+  const videoUrl = getMediaUrl(settings?.hero_video_url || "", false);
   const isEmbed = videoUrl.includes("embed") || videoUrl.includes("preview");
 
   const images = (settings?.hero_bg_url || "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop")
@@ -78,6 +78,7 @@ export default function HeroSection() {
         {settings?.hero_video_url ? (
           isEmbed ? (
             <iframe
+              id="hero-video-iframe"
               src={videoUrl}
               style={{ width: "100vw", height: "56.25vw", minHeight: "100vh", minWidth: "177.77vh", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", border: "none", pointerEvents: "none", opacity: 0.6 }}
               allow="autoplay; encrypted-media"
@@ -190,11 +191,16 @@ export default function HeroSection() {
       </div>
 
       {/* Sound Toggle Button */}
-      {settings?.hero_video_url && !isEmbed && (
+      {settings?.hero_video_url && (
         <button
           onClick={() => {
             setIsMuted(!isMuted);
-            if (videoRef.current) {
+            if (isEmbed) {
+              const iframe = document.getElementById('hero-video-iframe') as HTMLIFrameElement;
+              if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: !isMuted ? 'mute' : 'unMute' }), '*');
+              }
+            } else if (videoRef.current) {
               videoRef.current.muted = !isMuted;
             }
           }}
