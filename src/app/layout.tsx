@@ -11,6 +11,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 import connectToDatabase, { SiteSetting } from "@/lib/db";
 import GlobalAudioPlayer from "@/components/layout/GlobalAudioPlayer";
+import PromoPopup from "@/components/layout/PromoPopup";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -129,6 +130,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </a>
             
             <GlobalAudioPlayer />
+            <PromoPopup />
           </LanguageProvider>
         </SettingsProvider>
         <style>{`.whatsapp-fab:hover { transform: scale(1.1) !important; }`}</style>

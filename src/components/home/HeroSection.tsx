@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useSettings } from "@/context/SettingsContext";
+import { Volume2, VolumeX } from "lucide-react";
 
 import { getMediaUrl } from "@/lib/utils";
 
@@ -11,6 +12,7 @@ export default function HeroSection() {
   const settings = useSettings();
   const [currentImg, setCurrentImg] = useState(0);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoUrl = getMediaUrl(settings?.hero_video_url || "", true);
@@ -85,7 +87,7 @@ export default function HeroSection() {
               <video 
                 ref={videoRef}
                 src={videoUrl} 
-                autoPlay loop muted playsInline 
+                autoPlay loop muted={isMuted} playsInline 
                 style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", opacity: 0.6 }} 
               />
             </>
@@ -186,6 +188,35 @@ export default function HeroSection() {
           </div>
         </div>
       </div>
+
+      {/* Sound Toggle Button */}
+      {settings?.hero_video_url && !isEmbed && (
+        <button
+          onClick={() => setIsMuted(!isMuted)}
+          style={{
+            position: "absolute",
+            bottom: 40,
+            right: isRtl ? "auto" : 40,
+            left: isRtl ? 40 : "auto",
+            zIndex: 10,
+            background: "rgba(255,255,255,0.1)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            color: "#fff",
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            backdropFilter: "blur(10px)",
+            transition: "all 0.3s ease"
+          }}
+          aria-label="Toggle Sound"
+        >
+          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+        </button>
+      )}
     </section>
   );
 }

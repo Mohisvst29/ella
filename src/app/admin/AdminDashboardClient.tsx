@@ -1356,6 +1356,50 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
+              {/* Promo Popup Settings */}
+              <div>
+                <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "مربع العروض الترويجية" : "Promotional Popup"}</h3>
+                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "تفعيل المربع" : "Enable Popup"}</label>
+                    <select value={settingsState.promo_enabled || "0"} onChange={e => setSettingsState({ ...settingsState, promo_enabled: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })}>
+                      <option value="0" style={{background: "#1a1114"}}>{isRtl ? "معطل" : "Disabled"}</option>
+                      <option value="1" style={{background: "#1a1114"}}>{isRtl ? "مفعل" : "Enabled"}</option>
+                    </select>
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "مدة الظهور (ثواني)" : "Interval (Seconds)"}</label>
+                    <input type="number" value={settingsState.promo_interval || "20"} onChange={e => setSettingsState({ ...settingsState, promo_interval: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="20" />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "عنوان العرض (EN)" : "Promo Title (EN)"}</label>
+                    <input type="text" value={settingsState.promo_title_en || ""} onChange={e => setSettingsState({ ...settingsState, promo_title_en: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="Special Offer" />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "عنوان العرض (AR)" : "Promo Title (AR)"}</label>
+                    <input type="text" value={settingsState.promo_title_ar || ""} onChange={e => setSettingsState({ ...settingsState, promo_title_ar: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14, textAlign: "right" })} placeholder="عرض خاص" />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "نص العرض (EN)" : "Promo Text (EN)"}</label>
+                    <textarea rows={3} value={settingsState.promo_text_en || ""} onChange={e => setSettingsState({ ...settingsState, promo_text_en: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "نص العرض (AR)" : "Promo Text (AR)"}</label>
+                    <textarea rows={3} value={settingsState.promo_text_ar || ""} onChange={e => setSettingsState({ ...settingsState, promo_text_ar: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14, textAlign: "right" })} />
+                  </div>
+                  <div style={s({ display: "flex", flexDirection: "column", gap: 8, gridColumn: "span 2" })}>
+                    <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صورة العرض (اختياري)" : "Promo Image URL (Optional)"}</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input type="text" value={settingsState.promo_image_url || ""} onChange={e => setSettingsState({ ...settingsState, promo_image_url: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="https://..." />
+                      <label className="btn btn-outline" style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "0 16px" }}>
+                        <span className="icon">upload</span>
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleUpload(e, "promo_image_url")} />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Administrative Access */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "بيانات الدخول للوحة التحكم" : "Admin Dashboard Access"}</h3>
