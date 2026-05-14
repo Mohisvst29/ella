@@ -11,7 +11,6 @@ export default function HeroSection() {
   const settings = useSettings();
   const [currentImg, setCurrentImg] = useState(0);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoUrl = getMediaUrl(settings?.hero_video_url || "", true);
@@ -86,20 +85,9 @@ export default function HeroSection() {
               <video 
                 ref={videoRef}
                 src={videoUrl} 
-                autoPlay loop muted={isMuted} playsInline 
+                autoPlay loop muted playsInline 
                 style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", opacity: 0.6 }} 
               />
-              <button 
-                onClick={() => setIsMuted(!isMuted)}
-                style={{
-                  position: "absolute", bottom: 40, [isRtl ? 'left' : 'right']: 40,
-                  width: 48, height: 48, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)",
-                  background: "rgba(0,0,0,0.3)", backdropFilter: "blur(8px)", color: "#fff",
-                  display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10
-                }}
-              >
-                <span className="icon" style={{ fontSize: 20 }}>{isMuted ? "volume_off" : "volume_up"}</span>
-              </button>
             </>
           )
         ) : (
