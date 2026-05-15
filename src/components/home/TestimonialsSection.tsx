@@ -13,6 +13,8 @@ export default function TestimonialsSection() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const [rating, setRating] = useState(5);
+
   useEffect(() => {
     fetch("/api/reviews")
       .then(res => res.json())
@@ -33,7 +35,7 @@ export default function TestimonialsSection() {
     const data = {
       client_name: fd.get("name"),
       comment: fd.get("comment"),
-      rating: 5
+      rating: rating
     };
 
     try {
@@ -70,7 +72,7 @@ export default function TestimonialsSection() {
             }}>
               <div style={{ position: "absolute", top: 24, [isRtl ? 'left' : 'right']: 32, display: "flex", gap: 2 }}>
                 {[...Array(5)].map((_, j) => (
-                  <span key={j} className="icon icon-fill" style={{ fontSize: 14, color: "var(--pink)" }}>star</span>
+                  <span key={j} className={j < (rev.rating || 5) ? "icon icon-fill" : "icon"} style={{ fontSize: 14, color: j < (rev.rating || 5) ? "var(--pink)" : "var(--text-muted)" }}>star</span>
                 ))}
               </div>
               <div style={{ fontFamily: "var(--font-display)", fontSize: 56, lineHeight: 1, marginBottom: 12, opacity: 0.15, color: "var(--pink)", textAlign: isRtl ? "right" : "left" }}>&ldquo;</div>
@@ -131,6 +133,21 @@ export default function TestimonialsSection() {
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     <label style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)", textAlign: isRtl ? "right" : "left" }}>{isRtl ? "التعليق" : "Your Review"}</label>
                     <textarea name="comment" required rows={4} placeholder={isRtl ? "اكتبي تجربتك هنا..." : "Tell us about your session..."} style={{ textAlign: isRtl ? "right" : "left" }} />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: isRtl ? "flex-end" : "flex-start" }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", color: "var(--text-dim)" }}>{isRtl ? "التقييم" : "Rating"}</label>
+                    <div style={{ display: "flex", gap: 8, flexDirection: isRtl ? "row-reverse" : "row" }}>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span 
+                          key={star} 
+                          onClick={() => setRating(star)}
+                          className={star <= rating ? "icon icon-fill" : "icon"} 
+                          style={{ fontSize: 28, color: star <= rating ? "var(--pink)" : "var(--text-muted)", cursor: "pointer", transition: "color 0.2s ease" }}
+                        >
+                          star
+                        </span>
+                      ))}
+                    </div>
                   </div>
                   <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: 12 }}>
                     {loading ? (isRtl ? "جاري الإرسال..." : "Sending...") : (isRtl ? "إرسال المراجعة" : "Submit Review")}
