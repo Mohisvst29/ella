@@ -109,9 +109,10 @@ export default function AdminDashboardClient({
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
+          const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
           canvas.toBlob((blob) => {
             resolve(blob || file);
-          }, 'image/jpeg', 0.85);
+          }, mimeType, 0.85);
         };
       };
     });
@@ -123,7 +124,7 @@ export default function AdminDashboardClient({
     setIsUploading(true);
     try {
       let fileToUpload: File | Blob = file;
-      if (file.type.startsWith('image/')) {
+      if (file.type.startsWith('image/') && file.type !== 'image/svg+xml' && file.type !== 'image/gif') {
         fileToUpload = await compressImage(file);
       }
       const formData = new FormData();
