@@ -399,7 +399,7 @@ export default function AdminDashboardClient({
     };
     return (
       <div style={s({ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: 20 })}>
-        <div className="anim-scale-in" style={s({ background: "var(--surface)", border: "1px solid var(--border)", padding: 40, borderRadius: "var(--radius)", width: "100%", maxWidth: 400, textAlign: isRtl ? "right" : "left", boxShadow: "0 20px 40px rgba(0,0,0,0.3)" })}>
+        <div className="anim-scale-in" style={s({ background: "var(--surface)", border: "1px solid var(--border)", padding: isMobile ? 20 : 40, borderRadius: "var(--radius)", width: "100%", maxWidth: isMobile ? "95vw" : 400, textAlign: isRtl ? "right" : "left", boxShadow: "0 20px 40px rgba(0,0,0,0.3)" })}>
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <h1 style={s({ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 700, color: "var(--pink)", marginBottom: 8 })}>Ella Media</h1>
             <p style={s({ fontSize: 13, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.1em" })}>{t("admin.portal")}</p>
@@ -426,7 +426,7 @@ export default function AdminDashboardClient({
   }
 
   return (
-    <div style={s({ display: "flex", minHeight: "100vh", background: "var(--bg)", color: "var(--text)", flexDirection: isRtl ? "row-reverse" : "row" })}>
+    <div style={s({ display: "flex", minHeight: "100vh", maxWidth: "100vw", overflowX: "hidden", background: "var(--bg)", color: "var(--text)", flexDirection: isRtl ? "row-reverse" : "row" })}>
       {isMobile && (
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -436,6 +436,9 @@ export default function AdminDashboardClient({
         </button>
       )}
       
+      {isMobile && isSidebarOpen && (
+        <div onClick={() => setIsSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 40 }} />
+      )}
       {/* Sidebar */}
       <aside style={s({ width: 220, flexShrink: 0, background: "var(--bg-2)", borderRight: isRtl ? "none" : "1px solid var(--border)", borderLeft: isRtl ? "1px solid var(--border)" : "none", display: "flex", flexDirection: "column", padding: "28px 0", position: "fixed", top: 0, [isRtl ? 'right' : 'left']: isMobile ? (isSidebarOpen ? 0 : -250) : 0, height: "100vh", zIndex: 50, textAlign: isRtl ? "right" : "left", transition: "all 0.3s ease" })}>
         <div style={s({ padding: "0 20px 28px", borderBottom: "1px solid var(--border)" })}>
@@ -531,7 +534,7 @@ export default function AdminDashboardClient({
                 </thead>
                 <tbody>
                   {filtered.length === 0 ? (
-                    <tr><td colSpan={5} style={s({ padding: 40, textAlign: "center", color: "var(--text-dim)" })}>{isRtl ? "لا توجد طلبات حجز حالياً" : "No booking requests found"}</td></tr>
+                    <tr><td colSpan={5} style={s({ padding: isMobile ? 20 : 40, textAlign: "center", color: "var(--text-dim)" })}>{isRtl ? "لا توجد طلبات حجز حالياً" : "No booking requests found"}</td></tr>
                   ) : filtered.map(b => {
                     const st = statusMap[b.status] || statusMap.pending;
                     return (
@@ -956,7 +959,7 @@ export default function AdminDashboardClient({
               {/* Branding Section */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>الهوية البصرية</h3>
-                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "رابط الشعار (URL)" : "Logo URL"}</label>
                     <div style={{ display: "flex", gap: 8 }}>
@@ -988,7 +991,7 @@ export default function AdminDashboardClient({
               {/* Typography Section */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>الخطوط (Google Fonts)</h3>
-                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "الخط الإنجليزي الأساسي" : "Primary English Font"}</label>
                     <select 
@@ -1017,7 +1020,7 @@ export default function AdminDashboardClient({
               {/* Media Section */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>الوسائط والصور</h3>
-                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 })}>
 
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "صور الهيدر (Hero Images)" : "Hero Images"}</label>
@@ -1092,7 +1095,7 @@ export default function AdminDashboardClient({
                 <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,176,204,0.03)", borderRadius: 12, border: "1px solid var(--border)" })}>
                   <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--pink)" })}>{isRtl ? "إعدادات عامة (العنوان العلوي والأزرار)" : "Global Settings (Tagline & Buttons)"}</h4>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الصغير العلوي (EN)" : "Upper Tagline (EN)"}</label>
                         <input type="text" value={settingsState.hero_tagline_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_tagline_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1102,7 +1105,7 @@ export default function AdminDashboardClient({
                         <input type="text" value={settingsState.hero_tagline_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_tagline_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
                       </div>
                     </div>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "نص زر احجز الآن (EN)" : "CTA Button 1 (EN)"}</label>
                         <input type="text" value={settingsState.hero_cta1_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_cta1_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1112,7 +1115,7 @@ export default function AdminDashboardClient({
                         <input type="text" value={settingsState.hero_cta1_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_cta1_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
                       </div>
                     </div>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "نص زر المعرض (EN)" : "CTA Button 2 (EN)"}</label>
                         <input type="text" value={settingsState.hero_cta2_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_cta2_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1130,7 +1133,7 @@ export default function AdminDashboardClient({
                 <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,176,204,0.02)", borderRadius: 12, border: "1px solid var(--pink)" })}>
                   <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--pink)" })}>{isRtl ? "فيديو الخلفية والصور" : "Background Video & Images"}</h4>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "رابط فيديو الهيرو (YouTube/Drive)" : "Hero Video URL (YouTube/Drive)"}</label>
                         <input type="text" value={settingsState.hero_video_url || ""} onChange={e => setSettingsState({ ...settingsState, hero_video_url: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} placeholder="https://..." />
@@ -1146,7 +1149,7 @@ export default function AdminDashboardClient({
                 <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,255,255,0.01)", borderRadius: 12, border: "1px solid var(--border)" })}>
                   <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--pink)" })}>{isRtl ? "الشريحة 1 (الأساسية)" : "Slide 1 (Main)"}</h4>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان الأساسي (EN)" : "Primary Title (EN)"}</label>
                         <input type="text" value={settingsState.hero_title_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_title_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1156,7 +1159,7 @@ export default function AdminDashboardClient({
                         <input type="text" value={settingsState.hero_title_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_title_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
                       </div>
                     </div>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الكلمة الملونة (EN)" : "Gradient Text (EN)"}</label>
                         <input type="text" value={settingsState.hero_span_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_span_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1166,7 +1169,7 @@ export default function AdminDashboardClient({
                         <input type="text" value={settingsState.hero_span_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_span_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
                       </div>
                     </div>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
                         <textarea rows={2} value={settingsState.hero_desc_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1183,7 +1186,7 @@ export default function AdminDashboardClient({
                 <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,255,255,0.01)", borderRadius: 12, border: "1px solid var(--border)" })}>
                   <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--cyan)" })}>{isRtl ? "الشريحة 2" : "Slide 2"}</h4>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
                         <input type="text" value={settingsState.hero_title2_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_title2_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1193,7 +1196,7 @@ export default function AdminDashboardClient({
                         <input type="text" value={settingsState.hero_title2_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_title2_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
                       </div>
                     </div>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
                         <textarea rows={2} value={settingsState.hero_desc2_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc2_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1210,7 +1213,7 @@ export default function AdminDashboardClient({
                 <div style={s({ marginBottom: 32, padding: 20, background: "rgba(255,255,255,0.01)", borderRadius: 12, border: "1px solid var(--border)" })}>
                   <h4 style={s({ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--purple)" })}>{isRtl ? "الشريحة 3" : "Slide 3"}</h4>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
                         <input type="text" value={settingsState.hero_title3_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_title3_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1220,7 +1223,7 @@ export default function AdminDashboardClient({
                         <input type="text" value={settingsState.hero_title3_ar || ""} onChange={e => setSettingsState({ ...settingsState, hero_title3_ar: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: "right" })} />
                       </div>
                     </div>
-                    <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+                    <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                       <div>
                         <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
                         <textarea rows={2} value={settingsState.hero_desc3_en || ""} onChange={e => setSettingsState({ ...settingsState, hero_desc3_en: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1237,7 +1240,7 @@ export default function AdminDashboardClient({
               {/* Section Images */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "صور أقسام الموقع" : "Section Images"}</h3>
-                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 })}>
                   
                   {/* About Hero */}
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
@@ -1329,7 +1332,7 @@ export default function AdminDashboardClient({
               {/* Contact Info Section */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "معلومات التواصل" : "Contact Information"}</h3>
-                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "البريد الإلكتروني" : "Contact Email"}</label>
                     <input type="email" value={settingsState.contact_email || ""} onChange={e => setSettingsState({ ...settingsState, contact_email: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="studio@aylamedia.sa" />
@@ -1356,7 +1359,7 @@ export default function AdminDashboardClient({
               {/* Social Media Section */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>روابط السوشيال ميديا</h3>
-                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>Instagram</label>
                     <input 
@@ -1453,7 +1456,7 @@ export default function AdminDashboardClient({
               {/* Promo Popup Settings */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "مربع العروض الترويجية" : "Promotional Popup"}</h3>
-                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "تفعيل المربع" : "Enable Popup"}</label>
                     <select value={settingsState.promo_enabled || "0"} onChange={e => setSettingsState({ ...settingsState, promo_enabled: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })}>
@@ -1497,7 +1500,7 @@ export default function AdminDashboardClient({
               {/* Administrative Access */}
               <div>
                 <h3 style={s({ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 12, color: "var(--pink)" })}>{isRtl ? "بيانات الدخول للوحة التحكم" : "Admin Dashboard Access"}</h3>
-                <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 })}>
+                <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 })}>
                   <div style={s({ display: "flex", flexDirection: "column", gap: 8 })}>
                     <label style={s({ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" })}>{isRtl ? "اسم المستخدم" : "Admin Username"}</label>
                     <input type="text" value={settingsState.admin_username || ""} onChange={e => setSettingsState({ ...settingsState, admin_username: e.target.value })} style={s({ padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", width: "100%", fontSize: 14 })} placeholder="admin" />
@@ -1620,7 +1623,7 @@ export default function AdminDashboardClient({
       {/* Booking Details Modal */}
       {selected && (
         <div onClick={() => setSelected(null)} style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(10px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 })}>
-          <div onClick={e => e.stopPropagation()} style={s({ background: "var(--bg-3)", border: "1px solid var(--border)", borderRadius: 24, padding: 40, maxWidth: 500, width: "100%", textAlign: isRtl ? "right" : "left" })}>
+          <div onClick={e => e.stopPropagation()} style={s({ background: "var(--bg-3)", border: "1px solid var(--border)", borderRadius: 24, padding: isMobile ? 20 : 40, maxWidth: isMobile ? "95vw" : 500, width: "100%", textAlign: isRtl ? "right" : "left" })}>
             <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 600, marginBottom: 28 })}>{t("admin.bookingDetails")}</h3>
             {[
               [t("admin.client"), selected.client_name], 
@@ -1764,7 +1767,7 @@ export default function AdminDashboardClient({
       {addingGalleryImage && (
         <div style={s({ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 16px" })}>
           <div style={s({ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" })} onClick={() => setAddingGalleryImage(null)} />
-          <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: 500, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 32, maxHeight: "90vh", overflowY: "auto" })}>
+          <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: isMobile ? "95vw" : 500, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 32, maxHeight: "90vh", overflowY: "auto" })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>إضافة صورة للمعرض</h3>
               <button onClick={() => setAddingGalleryImage(null)} style={s({ color: "var(--text-muted)", cursor: "pointer", background: "none", border: "none" })}>
@@ -1967,7 +1970,7 @@ export default function AdminDashboardClient({
       {/* Team Modal */}
       {editingTeamMember && (
         <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
-          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 600, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: isMobile ? "95vw" : 600, maxHeight: "90vh", overflowY: "auto", padding: isMobile ? 16 : 32 })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingTeamMember.id ? (isRtl ? "تعديل عضو" : "Edit Member") : (isRtl ? "إضافة عضو" : "Add Member")}</h3>
               <button onClick={() => setEditingTeamMember(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
@@ -1976,7 +1979,7 @@ export default function AdminDashboardClient({
             </div>
 
             <form onSubmit={saveTeamMember} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الاسم (EN)" : "Name (EN)"}</label>
                   <input required type="text" value={editingTeamMember.name || ""} onChange={e => setEditingTeamMember({ ...editingTeamMember, name: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -1987,7 +1990,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "المسمى الوظيفي (EN)" : "Role (EN)"}</label>
                   <input type="text" value={editingTeamMember.role || ""} onChange={e => setEditingTeamMember({ ...editingTeamMember, role: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2022,7 +2025,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: isMobile ? 24 : 12, width: "100%", flexDirection: isRtl ? "row-reverse" : "row" })}>
                 <button type="button" onClick={() => setEditingTeamMember(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
                 <button type="submit" disabled={isSaving || isUploading} className="btn btn-primary">
                   {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Member")}
@@ -2035,7 +2038,7 @@ export default function AdminDashboardClient({
       {/* Service Modal */}
       {editingService && (
         <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
-          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 600, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: isMobile ? "95vw" : 600, maxHeight: "90vh", overflowY: "auto", padding: isMobile ? 16 : 32 })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingService.id ? (isRtl ? "تعديل خدمة" : "Edit Service") : (isRtl ? "إضافة خدمة" : "Add Service")}</h3>
               <button onClick={() => setEditingService(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
@@ -2044,7 +2047,7 @@ export default function AdminDashboardClient({
             </div>
 
             <form onSubmit={saveService} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
                   <input required type="text" value={editingService.title || ""} onChange={e => setEditingService({ ...editingService, title: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2055,7 +2058,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الوصف (EN)" : "Description (EN)"}</label>
                   <textarea rows={3} value={editingService.desc || ""} onChange={e => setEditingService({ ...editingService, desc: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2090,7 +2093,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: isMobile ? 24 : 12, width: "100%", flexDirection: isRtl ? "row-reverse" : "row" })}>
                 <button type="button" onClick={() => setEditingService(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
                 <button type="submit" disabled={isSaving || isUploading} className="btn btn-primary">
                   {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ البيانات" : "Save Service")}
@@ -2104,7 +2107,7 @@ export default function AdminDashboardClient({
       {/* Review Modal */}
       {editingReview && (
         <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
-          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 600, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: isMobile ? "95vw" : 600, maxHeight: "90vh", overflowY: "auto", padding: isMobile ? 16 : 32 })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingReview.id ? (isRtl ? "تعديل مراجعة" : "Edit Review") : (isRtl ? "إضافة مراجعة" : "Add Review")}</h3>
               <button onClick={() => setEditingReview(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
@@ -2140,7 +2143,7 @@ export default function AdminDashboardClient({
               }} 
               style={s({ display: "flex", flexDirection: "column", gap: 24 })}
             >
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "اسم العميل (EN)" : "Client Name (EN)"}</label>
                   <input required type="text" value={editingReview.client_name || ""} onChange={e => setEditingReview({ ...editingReview, client_name: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2151,7 +2154,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "المراجعة (EN)" : "Review (EN)"}</label>
                   <textarea rows={4} required value={editingReview.comment || ""} onChange={e => setEditingReview({ ...editingReview, comment: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2162,7 +2165,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "التقييم (1-5)" : "Rating (1-5)"}</label>
                   <input type="number" min="1" max="5" value={editingReview.rating || 5} onChange={e => setEditingReview({ ...editingReview, rating: parseInt(e.target.value) })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2175,7 +2178,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: isMobile ? 24 : 12, width: "100%", flexDirection: isRtl ? "row-reverse" : "row" })}>
                 <button type="button" onClick={() => setEditingReview(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
                 <button type="submit" disabled={isSaving} className="btn btn-primary">
                   {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ المراجعة" : "Save Review")}
@@ -2188,7 +2191,7 @@ export default function AdminDashboardClient({
       {/* Blog Modal */}
       {editingPost && (
         <div style={s({ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 })}>
-          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: 900, maxHeight: "90vh", overflowY: "auto", padding: 32 })}>
+          <div className="anim-fade-up" style={s({ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", width: "100%", maxWidth: isMobile ? "95vw" : 900, maxHeight: "90vh", overflowY: "auto", padding: isMobile ? 16 : 32 })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h3 style={s({ fontSize: 20, fontWeight: 700 })}>{editingPost.id ? (isRtl ? "تعديل مقال" : "Edit Post") : (isRtl ? "مقال جديد" : "New Post")}</h3>
               <button onClick={() => setEditingPost(null)} style={s({ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer" })}>
@@ -2197,7 +2200,7 @@ export default function AdminDashboardClient({
             </div>
 
             <form onSubmit={savePost} style={s({ display: "flex", flexDirection: "column", gap: 24 })}>
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "العنوان (EN)" : "Title (EN)"}</label>
                   <input required type="text" value={editingPost.title || ""} onChange={e => setEditingPost({ ...editingPost, title: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2208,7 +2211,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "الرابط المختصر (Slug)" : "Slug"}</label>
                   <input required type="text" value={editingPost.slug || ""} onChange={e => setEditingPost({ ...editingPost, slug: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2238,7 +2241,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "مقتطف (EN)" : "Excerpt (EN)"}</label>
                   <textarea rows={2} value={editingPost.excerpt || ""} onChange={e => setEditingPost({ ...editingPost, excerpt: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2249,7 +2252,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 })}>
+              <div style={s({ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 })}>
                 <div>
                   <label style={s({ display: "block", fontSize: 12, color: "var(--text-dim)", marginBottom: 8 })}>{isRtl ? "المحتوى (EN)" : "Content (EN)"}</label>
                   <textarea rows={8} value={editingPost.content || ""} onChange={e => setEditingPost({ ...editingPost, content: e.target.value })} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)" })} />
@@ -2260,7 +2263,7 @@ export default function AdminDashboardClient({
                 </div>
               </div>
 
-              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: isMobile ? 24 : 12, width: "100%", flexDirection: isRtl ? "row-reverse" : "row" })}>
                 <button type="button" onClick={() => setEditingPost(null)} className="btn btn-outline">{isRtl ? "إلغاء" : "Cancel"}</button>
                 <button type="submit" disabled={isSaving || isUploading} className="btn btn-primary">
                   {isSaving ? (isRtl ? "جاري الحفظ..." : "Saving...") : (isRtl ? "حفظ المقال" : "Save Post")}
@@ -2274,7 +2277,7 @@ export default function AdminDashboardClient({
       {editingReview && (
         <div style={s({ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 16px" })}>
           <div style={s({ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" })} onClick={() => setEditingReview(null)} />
-          <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: 500, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 32 })}>
+          <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: isMobile ? "95vw" : 500, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: isMobile ? 16 : 32 })}>
             <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
               <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{editingReview.id ? (isRtl ? "تعديل المراجعة" : "Edit Review") : (isRtl ? "إضافة مراجعة" : "Add Review")}</h3>
               <button onClick={() => setEditingReview(null)} style={s({ color: "var(--text-muted)", cursor: "pointer", background: "none", border: "none" })}>
