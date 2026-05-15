@@ -1,4 +1,4 @@
-import connectToDatabase, { Booking, Package, GalleryItem, BlogPost, SiteSetting, NewsletterSubscriber, TeamMember, Service, Addon } from "@/lib/db";
+import connectToDatabase, { Booking, Package, GalleryItem, BlogPost, SiteSetting, NewsletterSubscriber, TeamMember, Service, Addon, Review } from "@/lib/db";
 import AdminDashboardClient from "./AdminDashboardClient";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +44,7 @@ export default async function AdminPage() {
   const teamMembers = await TeamMember.find().sort({ order: 1 }).lean();
   const services = await Service.find().sort({ order: 1 }).lean();
   const addons = await Addon.find().lean();
+  const reviewsList = await Review.find().sort({ created_at: -1 }).lean();
 
   // Map _id to id for client components
   const mapIds = (arr: any[]) => arr.map(item => {
@@ -75,6 +76,7 @@ export default async function AdminPage() {
       teamMembers={mapIds(teamMembers)}
       services={mapIds(services)}
       addons={mapIds(addons)}
+      reviews={mapIds(reviewsList)}
     />
   );
 }

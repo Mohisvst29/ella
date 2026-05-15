@@ -18,6 +18,7 @@ interface AdminProps {
   teamMembers: any[];
   services: any[];
   addons: any[];
+  reviews: any[];
 }
 
 const englishFonts = ["Playfair Display", "Inter", "Roboto", "Montserrat", "Cinzel", "Cormorant Garamond", "Libre Baskerville", "Bodoni Moda", "Prata"];
@@ -33,7 +34,8 @@ export default function AdminDashboardClient({
   settings = {}, 
   teamMembers = [], 
   services: initialServices = [], 
-  addons: initialAddons = [] 
+  addons: initialAddons = [],
+  reviews: initialReviews = []
 }: AdminProps) {
   const { t, isRtl } = useLanguage();
   const router = useRouter();
@@ -57,7 +59,7 @@ export default function AdminDashboardClient({
   const [teamList, setTeamList] = useState(teamMembers);
   const [servicesList, setServicesList] = useState(initialServices);
   const [addonsList, setAddonsList] = useState(initialAddons);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>(initialReviews);
 
   const [editingPost, setEditingPost] = useState<any>(null);
   const [editingPackage, setEditingPackage] = useState<any>(null);
@@ -2232,6 +2234,72 @@ export default function AdminDashboardClient({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Review Modal */}
+      {editingReview && (
+        <div style={s({ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 16px" })}>
+          <div style={s({ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" })} onClick={() => setEditingReview(null)} />
+          <div className="anim-scale-in" style={s({ position: "relative", width: "100%", maxWidth: 500, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 32 })}>
+            <div style={s({ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexDirection: isRtl ? "row-reverse" : "row" })}>
+              <h3 style={s({ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 600 })}>{editingReview.id ? (isRtl ? "تعديل المراجعة" : "Edit Review") : (isRtl ? "إضافة مراجعة" : "Add Review")}</h3>
+              <button onClick={() => setEditingReview(null)} style={s({ color: "var(--text-muted)", cursor: "pointer", background: "none", border: "none" })}>
+                <span className="icon">close</span>
+              </button>
+            </div>
+            
+            <div style={s({ display: "flex", flexDirection: "column", gap: 16 })}>
+              <div>
+                <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "اسم العميل (إنجليزي)" : "Client Name (EN)"}</label>
+                <input type="text" value={editingReview.client_name || ""} onChange={e => setEditingReview({...editingReview, client_name: e.target.value})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
+              </div>
+
+              <div>
+                <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "اسم العميل (عربي)" : "Client Name (AR)"}</label>
+                <input type="text" value={editingReview.client_name_ar || ""} onChange={e => setEditingReview({...editingReview, client_name_ar: e.target.value})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
+              </div>
+
+              <div>
+                <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "المراجعة (إنجليزي)" : "Review (EN)"}</label>
+                <textarea rows={3} value={editingReview.comment || ""} onChange={e => setEditingReview({...editingReview, comment: e.target.value})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
+              </div>
+
+              <div>
+                <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "المراجعة (عربي)" : "Review (AR)"}</label>
+                <textarea rows={3} value={editingReview.comment_ar || ""} onChange={e => setEditingReview({...editingReview, comment_ar: e.target.value})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
+              </div>
+
+              <div>
+                <label style={s({ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-dim)", marginBottom: 8, textAlign: isRtl ? "right" : "left" })}>{isRtl ? "التقييم (1-5)" : "Rating (1-5)"}</label>
+                <input type="number" min="1" max="5" value={editingReview.rating || 5} onChange={e => setEditingReview({...editingReview, rating: Number(e.target.value)})} style={s({ width: "100%", padding: 12, borderRadius: 8, border: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", color: "var(--text)", textAlign: isRtl ? "right" : "left" })} />
+              </div>
+
+              <div style={s({ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 24 })}>
+                <button onClick={() => setEditingReview(null)} className="btn btn-outline" style={s({ padding: "8px 24px", fontSize: 13 })}>{isRtl ? "إلغاء" : "Cancel"}</button>
+                <button 
+                  onClick={async () => {
+                    setIsSaving(true);
+                    const method = editingReview.id ? "PATCH" : "POST";
+                    const url = editingReview.id ? `/api/reviews/${editingReview.id}` : "/api/reviews";
+                    const body = editingReview.id ? JSON.stringify(editingReview) : JSON.stringify({...editingReview, approved: 1});
+                    const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body });
+                    if(res.ok) {
+                      setEditingReview(null);
+                      router.refresh();
+                    } else {
+                      notify(isRtl ? "فشل الحفظ" : "Save failed", "error");
+                    }
+                    setIsSaving(false);
+                  }} 
+                  className="btn btn-primary" 
+                  style={s({ padding: "8px 24px", fontSize: 13, opacity: isSaving ? 0.5 : 1 })}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "..." : (isRtl ? "حفظ" : "Save")}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
