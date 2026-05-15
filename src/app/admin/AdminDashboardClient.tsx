@@ -194,7 +194,7 @@ export default function AdminDashboardClient({
       if (res.ok) {
         notify(isRtl ? "تم حفظ المراجعة" : "Review saved");
         setEditingReview(null);
-        fetch("/api/reviews").then(r => r.json()).then(setReviews);
+        fetch("/api/reviews?all=true").then(r => r.json()).then(setReviews);
       }
     } catch (e) {
       notify(isRtl ? "فشل الحفظ" : "Save failed", "error");
@@ -230,7 +230,7 @@ export default function AdminDashboardClient({
     fetch("/api/team").then(r => r.json()).then(setTeamList);
     fetch("/api/services").then(r => r.json()).then(setServicesList);
     fetch("/api/addons").then(r => r.json()).then(setAddonsList);
-    fetch("/api/reviews").then(r => r.json()).then(setReviews);
+    fetch("/api/reviews?all=true").then(r => r.json()).then(setReviews);
   }, []);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -2128,7 +2128,7 @@ export default function AdminDashboardClient({
                     notify(isRtl ? "تم الحفظ بنجاح" : "Saved successfully");
                     setEditingReview(null);
                     // Refresh reviews list
-                    const rRes = await fetch("/api/reviews");
+                    const rRes = await fetch("/api/reviews?all=true");
                     const rData = await rRes.json();
                     setReviews(rData);
                   }

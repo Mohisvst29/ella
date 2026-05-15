@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import connectToDatabase, { Review } from "@/lib/db";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const all = searchParams.get("all") === "true";
+    
     await connectToDatabase();
-    const reviews = await Review.find({ approved: 1 }).sort({ createdAt: -1 }).lean();
+    const query = all ? {} : { approved: 1 };
+    const reviews = await Review.find(query).sort({ createdAt: -1 }).lean();
     return NextResponse.json(reviews.map(r => ({
       ...r,
       id: (r as any)._id.toString()
